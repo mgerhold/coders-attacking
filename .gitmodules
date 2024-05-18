@@ -1,0 +1,6 @@
+[submodule "vcpkg"]
+	path = vcpkg
+	url = git@github.com:microsoft/vcpkg.git
+[submodule "vendor/lib2k"]
+	path = vendor/lib2k
+	url = git@github.com:mgerhold/lib2k.git

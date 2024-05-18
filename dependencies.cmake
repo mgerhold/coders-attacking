@@ -1,0 +1,12 @@
+include("${PROJECT_SOURCE_DIR}/cmake/CPM.cmake")
+include("${PROJECT_SOURCE_DIR}/cmake/system_link.cmake")
+
+function(coders_attacking_setup_dependencies)
+    find_package(Microsoft.GSL CONFIG REQUIRED)
+    find_package(raylib CONFIG REQUIRED)
+    find_package(tl-optional CONFIG REQUIRED)
+    find_package(spdlog CONFIG REQUIRED)
+    if (${coders_attacking_build_tests})
+        find_package(GTest CONFIG REQUIRED)
+    endif ()
+endfunction()
