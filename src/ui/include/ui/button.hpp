@@ -12,7 +12,8 @@ namespace ui {
 
     public:
         Button(std::string caption, std::shared_ptr<gfx::Font> font, std::function<void(Button&)> on_click)
-            : m_caption{ std::move(caption), std::move(font), 100, utils::Color::Black },
+            : m_caption{ std::move(caption),  std::move(font),   100,
+                         utils::Color::Black, Alignment::Center, VerticalAlignment::Middle },
               m_on_click{ std::move(on_click) } { }
 
         [[nodiscard]] bool handle_event(Event event) override {

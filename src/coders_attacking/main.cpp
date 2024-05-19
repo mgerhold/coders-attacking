@@ -1,5 +1,7 @@
+#include "ui/bumper.hpp"
 #include "ui/button.hpp"
 #include "ui/column_layout.hpp"
+#include "ui/grid_layout.hpp"
 #include "ui/label.hpp"
 #include "ui/panel.hpp"
 #include <gfx/font.hpp>
@@ -25,11 +27,13 @@ int main() {
     auto const font = std::make_shared<gfx::Font>(std::move(roboto).value());
 
     auto panel = ui::Panel{
-        std::make_unique<ui::ColumnLayout>(3),
+        std::make_unique<ui::GridLayout>(3, 4),
         Color::Brown,
     };
-    panel.add_widget(std::make_unique<ui::Panel>(std::make_unique<ui::ColumnLayout>(3), Color::Gold));
-    panel.add_widget(std::make_unique<ui::Button>("OK", font, [](auto&) {}));
+    panel.add_widgets<5>(
+            std::make_unique<ui::Panel>(std::make_unique<ui::ColumnLayout>(3), Color::Gold),
+            std::make_unique<ui::Button>("OK", font, [](auto&) {})
+    );
     panel.recalculate_absolute_area(window_area);
 
     while (not window.should_close()) {

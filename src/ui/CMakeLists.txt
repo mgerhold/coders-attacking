@@ -13,6 +13,9 @@ add_library(ui STATIC
         panel.cpp
         include/ui/column_layout.hpp
         include/ui/button.hpp
+        include/ui/grid_layout.hpp
+        include/ui/bumper.hpp
+        include/ui/alignment.hpp
 )
 
 target_include_directories(ui

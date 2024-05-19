@@ -1,6 +1,7 @@
 #pragma once
 
 #include "layout.hpp"
+#include "ui/bumper.hpp"
 #include "widget.hpp"
 
 #include <algorithm>
@@ -22,8 +23,12 @@ namespace ui {
             : m_color{ color },
               m_layout{ std::move(layout) } { }
 
-        void add_widget(std::unique_ptr<Widget> widget) {
-            m_widgets.emplace_back(std::move(widget));
+        template<usize prepended_bumpers = 0, std::convertible_to<std::unique_ptr<Widget>>... Widgets>
+        void add_widgets(Widgets&&... widget) {
+            for (auto i = usize{ 0 }; i < prepended_bumpers; ++i) {
+                m_widgets.emplace_back(std::make_unique<ui::Bumper>());
+            }
+            (([&]() { m_widgets.emplace_back(std::forward<Widgets>(widget)); }()), ...);
             m_layout->recalculate(m_widgets.size());
         }
 
