@@ -73,4 +73,8 @@ namespace gfx {
     void Renderer::draw_circle(utils::Vec2i const center, float const radius, utils::Color const color) {
         DrawCircle(center.x, center.y, radius, to_raylib(color));
     }
+
+    void Renderer::draw_fps(utils::Vec2i const position) {
+        DrawFPS(position.x, position.y);
+    }
 } // namespace gfx

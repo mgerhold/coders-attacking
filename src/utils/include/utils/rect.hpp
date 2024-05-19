@@ -70,7 +70,7 @@ namespace utils {
             return top_left + size / T{ 2 };
         }
 
-        [[nodiscard]] constexpr bool contains(Vec2<T> const position) {
+        [[nodiscard]] constexpr bool contains(Vec2<T> const position) const {
             // clang-format off
             return
                 position.x >= top_left.x

@@ -37,7 +37,7 @@ namespace view {
                   color{ color } { }
         };
 
-        // float m_zoom = 1.0f;
+        float m_zoom = 1.0f;
         utils::Vec2f m_offset;
         std::vector<BackgroundStar> m_background_stars;
         float m_elapsed_time = 0.0f;

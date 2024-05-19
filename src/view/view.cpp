@@ -63,9 +63,6 @@ namespace view {
 
         for (auto const& star : m_background_stars) {
             auto relative_position = star.position - m_offset / star.distance;
-            if (not FloatRect::unit().contains(relative_position)) {
-                continue;
-            }
             auto const brightness = std::clamp(
                     std::sin(m_elapsed_time * 2.0f * pi / star.period) * star.amplitude + star.base_brightness,
                     0.0f,
@@ -76,11 +73,12 @@ namespace view {
                 static_cast<u8>(static_cast<float>(star.color.g) * brightness),
                 static_cast<u8>(static_cast<float>(star.color.b) * brightness),
             };
-            renderer.draw_circle(
-                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(relative_position) },
-                    star.size,
-                    color
-            );
+            auto const absolute_position =
+                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(relative_position * m_zoom) };
+            if (not viewport.contains(absolute_position)) {
+                continue;
+            }
+            renderer.draw_circle(absolute_position, star.size, color);
         }
 
         auto const& settings = galaxy.game_settings();
@@ -91,7 +89,7 @@ namespace view {
                 auto const relative_position = Vec2f{
                     transform->position.x / settings.map_size.x,
                     transform->position.y / settings.map_size.y,
-                } - m_offset;
+                } * m_zoom - m_offset;
                 auto const absolute_position =
                         Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(relative_position) };
                 renderer.draw_circle(absolute_position, 5.0f, planet->color);
@@ -117,7 +115,7 @@ namespace view {
 
     [[nodiscard]] ui::HandleEventResult View::handle_event(ui::Event const& event) {
         if (auto const mouse_wheel_moved = std::get_if<ui::MouseWheelMoved>(&event)) {
-            spdlog::info("mouse wheel moved: {}", mouse_wheel_moved->delta.y);
+            m_zoom *= 1.0f + mouse_wheel_moved->delta.y * 0.1f;
             return ui::HandleEventResult::EventHandled;
         }
         return ui::HandleEventResult::EventNotHandled;
@@ -125,6 +123,7 @@ namespace view {
 
     void View::update(ui::EventSystem const& event_system, float const delta_seconds) {
         static constexpr auto scroll_speed = 0.1f;
+        static constexpr auto zoom_speed = 0.1f;
         if (event_system.is_key_down(ui::Key::Left)) {
             m_offset.x -= scroll_speed * delta_seconds;
         }
@@ -136,6 +135,12 @@ namespace view {
         }
         if (event_system.is_key_down(ui::Key::Down)) {
             m_offset.y += scroll_speed * delta_seconds;
+        }
+        if (event_system.is_key_down(ui::Key::KpAdd)) {
+            m_zoom += zoom_speed * delta_seconds;
+        }
+        if (event_system.is_key_down(ui::Key::KpSubtract)) {
+            m_zoom -= zoom_speed * delta_seconds;
         }
         m_elapsed_time += delta_seconds;
     }

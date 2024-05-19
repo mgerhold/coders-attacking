@@ -29,5 +29,6 @@ int main() {
         scene_stack.update(window.event_system(), window.delta_seconds());
         auto renderer = window.renderer();
         scene_stack.render(renderer);
+        renderer.draw_fps({ 10, 10 });
     }
 }
