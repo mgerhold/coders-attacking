@@ -57,13 +57,18 @@ private:
             std::make_unique<ui::GridLayout>(
                 16,
                 12,
+                ui::GridLayout::Area{{0,0},{1,12}},
+                ui::GridLayout::Area{{1,11},{15,1}},
                 ui::GridLayout::Area{ { 14, 11 }, { 2, 1 } }
             )
         );
         // clang-format on
-        m_user_interface.add_widgets(std::make_unique<ui::Button>("Exit", m_font, [&](auto const&) {
-            m_running = false;
-        }));
+        auto const frame_color = utils::Color{ 54, 59, 79 };
+        m_user_interface.add_widgets(
+                std::make_unique<ui::Panel>(frame_color),
+                std::make_unique<ui::Panel>(frame_color),
+                std::make_unique<ui::Button>("Exit", m_font, [&](auto const&) { m_running = false; })
+        );
     }
 
     [[nodiscard]] static Galaxy create_galaxy() {
