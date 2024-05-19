@@ -3,5 +3,5 @@
 #include <utils/vec2.hpp>
 
 struct Transform {
-    Vec2f position;
+    utils::Vec2f position;
 };

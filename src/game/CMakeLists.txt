@@ -11,7 +11,7 @@ target_link_libraries(game
         utils
 )
 
-target_link_system_libraries(coders_attacking
+target_link_system_libraries(game
         INTERFACE
         Microsoft.GSL::GSL
         tl::expected

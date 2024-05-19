@@ -12,7 +12,7 @@
 int main() {
     using utils::Color;
     using utils::Vec2i;
-    auto window = gfx::Window{ 800, 600, "coders attacking" };
+    auto window = gfx::Window{ { 800, 600 }, "coders attacking" };
     window.set_resizable(true);
     auto const window_area = utils::IntRect{ Vec2i{}, window.size() };
 

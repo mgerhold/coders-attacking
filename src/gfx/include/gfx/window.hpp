@@ -17,7 +17,7 @@ namespace gfx {
         ui::EventSystem m_event_system;
 
     public:
-        Window(int width, int height, char const* title);
+        Window(utils::Vec2i resolution, char const* title);
 
         [[nodiscard]] bool should_close() const;
         [[nodiscard]] utils::Vec2i size() const;

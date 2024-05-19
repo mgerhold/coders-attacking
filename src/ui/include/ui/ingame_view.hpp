@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widget.hpp"
+#include <view/view.hpp>
 
 namespace ui {
     class IngameView : public Widget {
@@ -10,7 +11,8 @@ namespace ui {
         }
 
         void render(gfx::Renderer& renderer) const override {
-            renderer.draw_filled_rectangle(area(), utils::Color::Black);
+            auto galaxy = Galaxy{};
+            view::render_game(galaxy, area(), renderer);
         }
     };
 } // namespace ui

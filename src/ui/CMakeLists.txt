@@ -28,6 +28,7 @@ target_link_libraries(ui
         PUBLIC
         utils
         gfx
+        view
         PRIVATE
         coders_attacking_options
 )
