@@ -15,9 +15,9 @@ protected:
 public:
     explicit Scene(SceneManager& scene_manager) : m_scene_manager{ &scene_manager } { }
 
-    Scene(Scene const& other) = default;
+    Scene(Scene const& other) = delete;
     Scene(Scene&& other) noexcept = default;
-    Scene& operator=(Scene const& other) = default;
+    Scene& operator=(Scene const& other) = delete;
     Scene& operator=(Scene&& other) noexcept = default;
     virtual ~Scene() = default;
 
