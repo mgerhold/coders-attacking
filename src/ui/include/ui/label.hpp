@@ -16,13 +16,8 @@ namespace ui {
         std::string m_wrapped;
 
     public:
-        Label(utils::FloatRect const& relative_area,
-              std::string caption,
-              std::shared_ptr<gfx::Font> font,
-              int const max_size,
-              utils::Color const color)
-            : Widget{ relative_area },
-              m_caption{ std::move(caption) },
+        Label(std::string caption, std::shared_ptr<gfx::Font> font, int const max_size, utils::Color const color)
+            : m_caption{ std::move(caption) },
               m_color{ color },
               m_font{ std::move(font) },
               m_max_size{ max_size },
@@ -38,6 +33,6 @@ namespace ui {
 
     private:
         void recalculate();
-        [[nodiscard]] bool does_fit(const char* text, int font_size);
+        [[nodiscard]] bool does_fit(char const* text, int font_size);
     };
 } // namespace ui

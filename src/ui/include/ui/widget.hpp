@@ -1,18 +1,22 @@
 #pragma once
 
 #include "event.hpp"
+#include <gfx/renderer.hpp>
 #include <utils/rect.hpp>
 #include <utils/vec2.hpp>
-#include <gfx/renderer.hpp>
 
 namespace ui {
     class Widget {
-    protected:
-        utils::FloatRect m_relative_area;
+    private:
         utils::IntRect m_absolute_area;
 
+    protected:
+        [[nodiscard]] utils::IntRect absolute_area() const {
+            return m_absolute_area;
+        }
+
     public:
-        explicit Widget(utils::FloatRect const& relative_area) : m_relative_area{ relative_area } { }
+        Widget() = default;
         Widget(Widget const& other) = default;
         Widget(Widget&& other) noexcept = default;
         Widget& operator=(Widget const& other) = default;
@@ -20,7 +24,6 @@ namespace ui {
         virtual ~Widget() = default;
 
         [[nodiscard]] virtual bool handle_event(Event event) = 0;
-        virtual void update() { }
         virtual void render(gfx::Renderer& renderer) const = 0;
         virtual void recalculate_absolute_area(utils::IntRect const& outer_area);
     };

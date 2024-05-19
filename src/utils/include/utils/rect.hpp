@@ -38,6 +38,16 @@ namespace utils {
             auto const absolute_size = absolute_bottom_right - absolute_top_left;
             return Rect{ absolute_top_left, absolute_size };
         }
+
+        [[nodiscard]] constexpr Rect scaled_from_center(float const factor) {
+            auto const vec = Vec2f{ center() } - Vec2f{ top_left };
+            auto const new_top_left = Vec2f{ top_left } + 0.5f * vec;
+            return Rect{ Vec2<T>{ new_top_left }, Vec2<T>{ Vec2f{ size } * factor } };
+        }
+
+        [[nodiscard]] constexpr Vec2<T> center() const {
+            return top_left + size / T{ 2 };
+        }
     };
 
     using IntRect = Rect<int>;

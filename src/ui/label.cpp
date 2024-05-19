@@ -5,7 +5,7 @@
 namespace ui {
 
     void Label::render(gfx::Renderer& renderer) const {
-        renderer.draw_text(*m_font, m_wrapped.c_str(), m_absolute_area.top_left, m_size, m_color);
+        renderer.draw_text(*m_font, m_wrapped.c_str(), absolute_area().top_left, m_size, m_color);
     }
 
     void Label::recalculate_absolute_area(utils::IntRect const& outer_area) {
@@ -27,6 +27,13 @@ namespace ui {
             }
 
             ++it;
+            if (it == parts.cend()) {
+                // there's only one word and the word fits
+                m_wrapped = std::move(line);
+                m_size = static_cast<float>(font_size);
+                return;
+            }
+
             auto is_start_of_line = false;
             while (true) {
                 auto appended = line;
@@ -64,7 +71,7 @@ namespace ui {
     }
 
     bool Label::does_fit(char const* const text, int const font_size) {
-        auto const max_area = utils::Vec2f{ m_absolute_area.size };
+        auto const max_area = utils::Vec2f{ absolute_area().size };
         auto const area = m_font->measure_text(text, static_cast<float>(font_size));
         return area.x <= max_area.x and area.y <= max_area.y;
     }

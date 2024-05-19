@@ -65,6 +65,10 @@ namespace utils {
             return lhs;
         }
 
+        [[nodiscard]] friend constexpr Vec2 operator*(T const lhs, Vec2 const rhs) {
+            return rhs * lhs;
+        }
+
         [[nodiscard]] friend constexpr Vec2 operator/(Vec2 lhs, T const rhs) {
             lhs /= rhs;
             return lhs;

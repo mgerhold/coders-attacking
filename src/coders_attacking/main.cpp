@@ -1,9 +1,9 @@
+#include "ui/button.hpp"
 #include "ui/column_layout.hpp"
 #include "ui/label.hpp"
 #include "ui/panel.hpp"
 #include <gfx/font.hpp>
 #include <gfx/window.hpp>
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 static constexpr auto lorem_ipsum =
@@ -21,25 +21,15 @@ int main() {
     window.set_resizable(true);
     auto const window_area = utils::IntRect{ Vec2i{}, window.size() };
 
-    auto roboto = window.load_font("assets/fonts/Roboto/Roboto-Regular.ttf", 20);
+    auto roboto = window.load_font("assets/fonts/Roboto/Roboto-Regular.ttf", 100);
     auto const font = std::make_shared<gfx::Font>(std::move(roboto).value());
 
-    auto label = ui::Label{
-        utils::FloatRect{ { 0.1, 0.1 }, { 0.2, 0.2 } },
-        lorem_ipsum,
-        font,
-        20,
-        Color::White
-    };
-    label.recalculate_absolute_area(window_area);
     auto panel = ui::Panel{
-        utils::FloatRect{ { 0.4, 0.4 }, { 0.5, 0.5 } },
         std::make_unique<ui::ColumnLayout>(3),
         Color::Brown,
     };
-    panel.add_widget(
-            std::make_unique<ui::Panel>(utils::FloatRect::unit(), std::make_unique<ui::ColumnLayout>(3), Color::Gold)
-    );
+    panel.add_widget(std::make_unique<ui::Panel>(std::make_unique<ui::ColumnLayout>(3), Color::Gold));
+    panel.add_widget(std::make_unique<ui::Button>("OK", font, [](auto&) {}));
     panel.recalculate_absolute_area(window_area);
 
     while (not window.should_close()) {
@@ -75,13 +65,11 @@ int main() {
             else if (auto const mouse_wheel_moved = get_if<ui::MouseWheelMoved>(&*event)) {
                 spdlog::info("mouse wheel moved by ({},{})", mouse_wheel_moved->delta.x, mouse_wheel_moved->delta.y);
             } else if (auto const window_resized = get_if<ui::WindowResized>(&*event)) {
-                label.recalculate_absolute_area(window_resized->new_area);
                 panel.recalculate_absolute_area(window_resized->new_area);
             }
         }
         auto renderer = window.renderer();
         renderer.clear(Color::Beige);
         panel.render(renderer);
-        label.render(renderer);
     }
 }
