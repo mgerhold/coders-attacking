@@ -17,6 +17,7 @@ namespace view {
             float period;
             float amplitude;
             float distance;
+            utils::Color color;
 
             BackgroundStar(
                     utils::Vec2f position,
@@ -24,14 +25,16 @@ namespace view {
                     float const base_brightness,
                     float const period,
                     float const amplitude,
-                    float const distance
+                    float const distance,
+                    utils::Color const color
             )
                 : position{ position },
                   size{ size },
                   base_brightness{ base_brightness },
                   period{ period },
                   amplitude{ amplitude },
-                  distance{ distance } { }
+                  distance{ distance },
+                  color{ color } { }
         };
 
         // float m_zoom = 1.0f;

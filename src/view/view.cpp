@@ -7,16 +7,45 @@
 
 namespace view {
     View::View() {
-        static constexpr auto num_background_stars = usize{ 1500 };
+        static constexpr auto num_background_stars = usize{ 1500 * 3 * 3 };
         auto random = c2k::Random{};
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
-            auto const position = utils::Vec2f{ random.next_float(), random.next_float() };
+            auto const position =
+                    utils::Vec2f{ (random.next_float() - 0.5f) * 3.0f, (random.next_float() - 0.5f) * 3.0f };
             auto const size = random.next_float() * 2.0f;
             auto const brightness = random.next_float() * 0.5f + 0.1f;
             auto const period = random.next_float() * 10.0f + 5.0f;
             auto const amplitude = random.next_float() * 0.4f;
             auto const distance = random.next_float() * 10.0f + 0.1f;
-            m_background_stars.emplace_back(position, size, brightness, period, amplitude, distance);
+            auto const planet_type = random.next_integral<int>(3);
+            auto const color = std::invoke([&] {
+                switch (planet_type) {
+                    case 0:
+                        // yellow
+                        return utils::Color{
+                            static_cast<u8>(random.next_integral(240, 256)),
+                            static_cast<u8>(random.next_integral(240, 256)),
+                            static_cast<u8>(random.next_integral(220, 240)),
+                        };
+                    case 1:
+                        // blue
+                        return utils::Color{
+                            static_cast<u8>(random.next_integral(220, 240)),
+                            static_cast<u8>(random.next_integral(220, 240)),
+                            static_cast<u8>(random.next_integral(240, 256)),
+                        };
+                    case 2:
+                        // white
+                        return utils::Color{
+                            static_cast<u8>(random.next_integral(240, 256)),
+                            static_cast<u8>(random.next_integral(240, 256)),
+                            static_cast<u8>(random.next_integral(240, 256)),
+                        };
+                }
+                assert(false and "unreachable");
+                return utils::Color{ utils::Color::Red };
+            });
+            m_background_stars.emplace_back(position, size, brightness, period, amplitude, distance, color);
         }
     }
 
@@ -33,20 +62,22 @@ namespace view {
         renderer.draw_filled_rectangle(viewport, Color::Black);
 
         for (auto const& star : m_background_stars) {
+            auto relative_position = star.position - m_offset / star.distance;
+            if (not FloatRect::unit().contains(relative_position)) {
+                continue;
+            }
             auto const brightness = std::clamp(
                     std::sin(m_elapsed_time * 2.0f * pi / star.period) * star.amplitude + star.base_brightness,
                     0.0f,
                     1.0f
             );
             auto const color = Color{
-                static_cast<u8>(255.0f * brightness),
-                static_cast<u8>(255.0f * brightness),
-                static_cast<u8>(255.0f * brightness),
+                static_cast<u8>(static_cast<float>(star.color.r) * brightness),
+                static_cast<u8>(static_cast<float>(star.color.g) * brightness),
+                static_cast<u8>(static_cast<float>(star.color.b) * brightness),
             };
             renderer.draw_circle(
-                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(
-                            star.position - m_offset / star.distance
-                    ) },
+                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(relative_position) },
                     star.size,
                     color
             );
