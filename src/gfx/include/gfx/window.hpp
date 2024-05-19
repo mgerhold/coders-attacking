@@ -35,5 +35,9 @@ namespace gfx {
         void poll_events();
 
         [[nodiscard]] tl::optional<ui::Event> next_event();
+
+        [[nodiscard]] ui::EventSystem const& event_system() const {
+            return m_event_system;
+        }
     };
 } // namespace gfx

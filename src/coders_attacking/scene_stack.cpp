@@ -3,14 +3,14 @@
 #include <lib2k/types.hpp>
 #include <ranges>
 
-void SceneStack::update(float const delta_seconds) {
+void SceneStack::update(ui::EventSystem const& event_system, float const delta_seconds) {
     auto scenes_to_delete = std::vector<usize>{};
     auto scenes_to_enqueue = std::vector<std::unique_ptr<Scene>>{};
     m_scene_manager_calls_allowed = true;
     for (auto i = usize{ 0 }; i < m_scenes.size(); ++i) {
         auto const index = m_scenes.size() - i - 1;
         m_should_delete_current_scene = false;
-        auto const result = m_scenes.at(index)->update(delta_seconds);
+        auto const result = m_scenes.at(index)->update(event_system, delta_seconds);
         if (m_should_delete_current_scene) {
             scenes_to_delete.push_back(index);
         }

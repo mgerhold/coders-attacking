@@ -15,7 +15,8 @@ namespace view {
             auto const brightness = random.next_float() * 0.5f + 0.1f;
             auto const period = random.next_float() * 10.0f + 5.0f;
             auto const amplitude = random.next_float() * 0.4f;
-            m_background_stars.emplace_back(position, size, brightness, period, amplitude);
+            auto const distance = random.next_float() * 10.0f + 0.1f;
+            m_background_stars.emplace_back(position, size, brightness, period, amplitude, distance);
         }
     }
 
@@ -43,7 +44,9 @@ namespace view {
                 static_cast<u8>(255.0f * brightness),
             };
             renderer.draw_circle(
-                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(star.position) },
+                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(
+                            star.position - m_offset / star.distance
+                    ) },
                     star.size,
                     color
             );
@@ -57,7 +60,7 @@ namespace view {
                 auto const relative_position = Vec2f{
                     transform->position.x / settings.map_size.x,
                     transform->position.y / settings.map_size.y,
-                };
+                } - m_offset;
                 auto const absolute_position =
                         Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(relative_position) };
                 renderer.draw_circle(absolute_position, 5.0f, planet->color);
@@ -89,7 +92,20 @@ namespace view {
         return ui::HandleEventResult::EventNotHandled;
     }
 
-    void View::update(float const delta_seconds) {
+    void View::update(ui::EventSystem const& event_system, float const delta_seconds) {
+        static constexpr auto scroll_speed = 0.1f;
+        if (event_system.is_key_down(ui::Key::Left)) {
+            m_offset.x -= scroll_speed * delta_seconds;
+        }
+        if (event_system.is_key_down(ui::Key::Right)) {
+            m_offset.x += scroll_speed * delta_seconds;
+        }
+        if (event_system.is_key_down(ui::Key::Up)) {
+            m_offset.y -= scroll_speed * delta_seconds;
+        }
+        if (event_system.is_key_down(ui::Key::Down)) {
+            m_offset.y += scroll_speed * delta_seconds;
+        }
         m_elapsed_time += delta_seconds;
     }
 } // namespace view

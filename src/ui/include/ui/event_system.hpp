@@ -17,6 +17,7 @@ namespace ui {
         void update();
         [[nodiscard]] tl::optional<Event> next_event();
         void enqueue_event(Event const& event);
+        [[nodiscard]] bool is_key_down(Key key) const;
 
     private:
         void update_keyboard();

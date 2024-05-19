@@ -94,4 +94,8 @@ namespace ui {
         }
     }
 
+    [[nodiscard]] bool EventSystem::is_key_down(Key const key) const {
+        return m_pressed_keys.contains(key);
+    }
+
 } // namespace ui

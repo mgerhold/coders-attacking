@@ -24,7 +24,7 @@ public:
         m_scenes.back()->recalculate_layout(m_window_area);
     }
 
-    void update(float delta_seconds);
+    void update(ui::EventSystem const& event_system, float delta_seconds);
     void handle_event(ui::Event const& event);
     void render(gfx::Renderer& renderer) const;
     void recalculate_layout(utils::IntRect area);

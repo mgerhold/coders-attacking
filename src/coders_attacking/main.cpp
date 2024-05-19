@@ -26,7 +26,7 @@ int main() {
         while (auto const event = window.next_event()) {
             scene_stack.handle_event(event.value());
         }
-        scene_stack.update(window.delta_seconds());
+        scene_stack.update(window.event_system(), window.delta_seconds());
         auto renderer = window.renderer();
         scene_stack.render(renderer);
     }
