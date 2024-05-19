@@ -1,12 +1,9 @@
 #pragma once
 
-#include <concepts>
+#include "concepts.hpp"
 #include <stdexcept>
 
 namespace utils {
-    template<typename T>
-    concept IsNumeric = std::integral<T> or std::floating_point<T>;
-
     template<IsNumeric T>
     class Vec2 final {
     public:
@@ -41,6 +38,10 @@ namespace utils {
             x /= scalar;
             y /= scalar;
             return *this;
+        }
+
+        constexpr Vec2 hadamard_product(Vec2 const other) const {
+            return Vec2{ x * other.x, y * other.y };
         }
 
         [[nodiscard]] friend constexpr Vec2 operator+(Vec2 lhs, Vec2 const rhs) {

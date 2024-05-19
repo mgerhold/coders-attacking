@@ -26,3 +26,7 @@ void Renderer::draw_text(
 ) { // clang-format on
     DrawText(text, position.x, position.y, size, to_raylib(color));
 }
+
+void Renderer::draw_filled_rectangle(utils::IntRect const& area, utils::Color const color) {
+    DrawRectangle(area.top_left.x, area.top_left.y, area.size.x, area.size.y, to_raylib(color));
+}

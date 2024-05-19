@@ -1,11 +1,39 @@
+#include "ui/column_layout.hpp"
+#include "ui/label.hpp"
+#include "ui/panel.hpp"
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <view/window.hpp>
+
+static constexpr auto lorem_ipsum =
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et "
+        "dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet "
+        "clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, "
+        "consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, "
+        "sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea "
+        "takimata sanctus est Lorem ipsum dolor sit amet.";
 
 int main() {
     using utils::Color;
     using utils::Vec2i;
     auto window = Window{ 800, 600, "coders attacking" };
+    auto const window_area = utils::IntRect{ Vec2i{}, window.size() };
+    auto label = ui::Label{
+        utils::FloatRect{ { 0.1, 0.1 }, { 0.2, 0.2 } },
+        lorem_ipsum,
+        Color::White
+    };
+    label.recalculate_absolute_area(window_area);
+    auto panel = ui::Panel{
+        utils::FloatRect{ { 0.4, 0.4 }, { 0.5, 0.5 } },
+        std::make_unique<ui::ColumnLayout>(3),
+        Color::Brown,
+    };
+    panel.add_widget(
+            std::make_unique<ui::Panel>(utils::FloatRect::unit(), std::make_unique<ui::ColumnLayout>(3), Color::Gold)
+    );
+    panel.recalculate_absolute_area(window_area);
+
     while (not window.should_close()) {
         window.poll_events();
         while (auto const event = window.next_event()) {
@@ -42,5 +70,7 @@ int main() {
         auto renderer = window.renderer();
         renderer.clear(Color::Beige);
         renderer.draw_text("Hello, dear folks on Twitch!", Vec2i{ 190, 200 }, 30, Color::Magenta);
+        panel.render(renderer);
+        label.render(renderer);
     }
 }

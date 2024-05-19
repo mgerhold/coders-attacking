@@ -5,6 +5,13 @@ add_library(ui STATIC
         include/ui/key.hpp
         include/ui/event.hpp
         include/ui/mouse_button.hpp
+        include/ui/label.hpp
+        label.cpp
+        widget.cpp
+        include/ui/panel.hpp
+        include/ui/layout.hpp
+        panel.cpp
+        include/ui/column_layout.hpp
 )
 
 target_include_directories(ui
@@ -15,6 +22,7 @@ target_include_directories(ui
 target_link_libraries(ui
         PUBLIC
         utils
+        view
         PRIVATE
         coders_attacking_options
 )
