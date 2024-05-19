@@ -1,7 +1,24 @@
+#include <cmath>
+#include <lib2k/random.hpp>
+#include <numbers>
+#include <ranges>
 #include <spdlog/spdlog.h>
 #include <view/view.hpp>
 
 namespace view {
+    View::View() {
+        static constexpr auto num_background_stars = usize{ 1500 };
+        auto random = c2k::Random{};
+        for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
+            auto const position = utils::Vec2f{ random.next_float(), random.next_float() };
+            auto const size = random.next_float() * 2.0f;
+            auto const brightness = random.next_float() * 0.5f + 0.1f;
+            auto const period = random.next_float() * 10.0f + 5.0f;
+            auto const amplitude = random.next_float() * 0.4f;
+            m_background_stars.emplace_back(position, size, brightness, period, amplitude);
+        }
+    }
+
     void View::render_game(
             Galaxy const& galaxy,
             utils::IntRect const& viewport,
@@ -10,7 +27,27 @@ namespace view {
     ) const {
         using namespace utils;
 
+        static constexpr auto pi = std::numbers::pi_v<float>;
+
         renderer.draw_filled_rectangle(viewport, Color::Black);
+
+        for (auto const& star : m_background_stars) {
+            auto const brightness = std::clamp(
+                    std::sin(m_elapsed_time * 2.0f * pi / star.period) * star.amplitude + star.base_brightness,
+                    0.0f,
+                    1.0f
+            );
+            auto const color = Color{
+                static_cast<u8>(255.0f * brightness),
+                static_cast<u8>(255.0f * brightness),
+                static_cast<u8>(255.0f * brightness),
+            };
+            renderer.draw_circle(
+                    Vec2i{ FloatRect{ viewport }.relative_to_absolute_position(star.position) },
+                    star.size,
+                    color
+            );
+        }
 
         auto const& settings = galaxy.game_settings();
 
@@ -50,5 +87,9 @@ namespace view {
             return ui::HandleEventResult::EventHandled;
         }
         return ui::HandleEventResult::EventNotHandled;
+    }
+
+    void View::update(float const delta_seconds) {
+        m_elapsed_time += delta_seconds;
     }
 } // namespace view

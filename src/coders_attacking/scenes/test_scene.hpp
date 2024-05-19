@@ -29,10 +29,11 @@ public:
     TestScene& operator=(TestScene&& other) noexcept = delete;
     ~TestScene() override = default;
 
-    [[nodiscard]] UpdateResult update(float) override {
+    [[nodiscard]] UpdateResult update(float const delta_seconds) override {
         if (not m_running) {
             end_scene();
         }
+        m_game_view.update(delta_seconds);
         return UpdateResult::KeepUpdating;
     }
 
