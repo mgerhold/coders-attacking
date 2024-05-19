@@ -2,7 +2,7 @@
 #include <raylib.h>
 #include <utility>
 
-static void set_window_flag(int const flag, bool const enabled) {
+static void set_window_flag(ConfigFlags const flag, bool const enabled) {
     if (enabled) {
         SetWindowState(flag);
     } else {
