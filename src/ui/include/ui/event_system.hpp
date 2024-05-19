@@ -16,6 +16,7 @@ namespace ui {
     public:
         void update();
         [[nodiscard]] tl::optional<Event> next_event();
+        void enqueue_event(Event const& event);
 
     private:
         void update_keyboard();

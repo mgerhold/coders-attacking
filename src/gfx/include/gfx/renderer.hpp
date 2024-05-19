@@ -1,8 +1,7 @@
 #pragma once
 
+#include "font.hpp"
 #include "utils/rect.hpp"
-
-
 #include <lib2k/unique_value.hpp>
 #include <utils/color.hpp>
 #include <utils/vec2.hpp>
@@ -25,7 +24,7 @@ namespace gfx {
 
     public:
         void clear(utils::Color color);
-        void draw_text(char const* text, utils::Vec2i position, int size, utils::Color color);
+        void draw_text(Font const& font, char const* text, utils::Vec2i position, float size, utils::Color color);
         void draw_filled_rectangle(utils::IntRect const& area, utils::Color color);
     };
 } // namespace gfx

@@ -21,10 +21,14 @@ namespace gfx {
 
         [[nodiscard]] bool should_close() const;
         [[nodiscard]] utils::Vec2i size() const;
+        [[nodiscard]] utils::IntRect area() const;
+        void set_resizable(bool enabled);
 
         [[nodiscard]] Renderer renderer() {
             return Renderer{};
         }
+
+        [[nodiscard]] tl::optional<Font> load_font(char const* filename, int font_size);
 
         void poll_events();
 

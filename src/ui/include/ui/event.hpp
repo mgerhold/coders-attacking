@@ -2,6 +2,7 @@
 
 #include "key.hpp"
 #include "mouse_button.hpp"
+#include <utils/rect.hpp>
 #include <utils/vec2.hpp>
 #include <variant>
 
@@ -33,5 +34,19 @@ namespace ui {
         utils::Vec2f delta;
     };
 
-    using Event = std::variant<KeyPressed, KeyReleased, MouseClicked, MouseReleased, MouseMoved, MouseWheelMoved>;
+    struct WindowResized final {
+        utils::IntRect new_area;
+    };
+
+    // clang-format off
+    using Event = std::variant<
+        KeyPressed,
+        KeyReleased,
+        MouseClicked,
+        MouseReleased,
+        MouseMoved,
+        MouseWheelMoved,
+        WindowResized
+    >;
+    // clang-format on
 } // namespace ui

@@ -1,5 +1,5 @@
-#include <raylib.h>
 #include <gfx/renderer.hpp>
+#include <raylib.h>
 
 [[nodiscard]] static Color to_raylib(utils::Color const color) {
     return Color{ color.r, color.g, color.b, color.a };
@@ -18,14 +18,21 @@ namespace gfx {
         ClearBackground(to_raylib(color));
     }
 
-    // clang-format off
     void Renderer::draw_text(
-        char const* const text,
-        utils::Vec2i const position,
-        int const size,
-        utils::Color const color
-    ) { // clang-format on
-        DrawText(text, position.x, position.y, size, to_raylib(color));
+            Font const& font,
+            char const* text,
+            utils::Vec2i const position,
+            float const size,
+            utils::Color const color
+    ) {
+        DrawTextEx(
+                *font.m_handle,
+                text,
+                ::Vector2{ static_cast<float>(position.x), static_cast<float>(position.y) },
+                size,
+                1.0f,
+                to_raylib(color)
+        );
     }
 
     void Renderer::draw_filled_rectangle(utils::IntRect const& area, utils::Color const color) {

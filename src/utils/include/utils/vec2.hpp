@@ -13,6 +13,12 @@ namespace utils {
         constexpr Vec2() = default;
         constexpr Vec2(T const x, T const y) : x{ x }, y{ y } { }
 
+        template<IsNumeric U>
+        constexpr explicit Vec2(Vec2<U> const other)
+            requires(not std::same_as<T, U>)
+            : x{ static_cast<T>(other.x) },
+              y{ static_cast<T>(other.y) } { }
+
         constexpr Vec2& operator+=(Vec2 const& other) {
             x += other.x;
             y += other.y;

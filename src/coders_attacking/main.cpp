@@ -1,9 +1,10 @@
 #include "ui/column_layout.hpp"
 #include "ui/label.hpp"
 #include "ui/panel.hpp"
+#include <gfx/font.hpp>
+#include <gfx/window.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
-#include <gfx/window.hpp>
 
 static constexpr auto lorem_ipsum =
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et "
@@ -17,10 +18,17 @@ int main() {
     using utils::Color;
     using utils::Vec2i;
     auto window = gfx::Window{ 800, 600, "coders attacking" };
+    window.set_resizable(true);
     auto const window_area = utils::IntRect{ Vec2i{}, window.size() };
+
+    auto roboto = window.load_font("assets/fonts/Roboto/Roboto-Regular.ttf", 20);
+    auto const font = std::make_shared<gfx::Font>(std::move(roboto).value());
+
     auto label = ui::Label{
         utils::FloatRect{ { 0.1, 0.1 }, { 0.2, 0.2 } },
         lorem_ipsum,
+        font,
+        20,
         Color::White
     };
     label.recalculate_absolute_area(window_area);
@@ -55,7 +63,7 @@ int main() {
                         mouse_released->position.x,
                         mouse_released->position.y
                 );
-            } else if (auto const mouse_moved = get_if<ui::MouseMoved>(&*event)) {
+            } /*else if (auto const mouse_moved = get_if<ui::MouseMoved>(&*event)) {
                 spdlog::info(
                         "mouse moved by ({},{}) to ({},{})",
                         mouse_moved->delta.x,
@@ -63,13 +71,16 @@ int main() {
                         mouse_moved->position.x,
                         mouse_moved->position.y
                 );
-            } else if (auto const mouse_wheel_moved = get_if<ui::MouseWheelMoved>(&*event)) {
+            }*/
+            else if (auto const mouse_wheel_moved = get_if<ui::MouseWheelMoved>(&*event)) {
                 spdlog::info("mouse wheel moved by ({},{})", mouse_wheel_moved->delta.x, mouse_wheel_moved->delta.y);
+            } else if (auto const window_resized = get_if<ui::WindowResized>(&*event)) {
+                label.recalculate_absolute_area(window_resized->new_area);
+                panel.recalculate_absolute_area(window_resized->new_area);
             }
         }
         auto renderer = window.renderer();
         renderer.clear(Color::Beige);
-        renderer.draw_text("Hello, dear folks on Twitch!", Vec2i{ 190, 200 }, 30, Color::Magenta);
         panel.render(renderer);
         label.render(renderer);
     }

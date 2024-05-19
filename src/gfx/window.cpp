@@ -1,6 +1,14 @@
+#include <gfx/window.hpp>
 #include <raylib.h>
 #include <utility>
-#include <gfx/window.hpp>
+
+static void set_window_flag(int const flag, bool const enabled) {
+    if (enabled) {
+        SetWindowState(flag);
+    } else {
+        ClearWindowState(flag);
+    }
+}
 
 namespace gfx {
     void Window::Deleter::operator()(std::monostate) const {
@@ -19,8 +27,27 @@ namespace gfx {
         return utils::Vec2i{ GetScreenWidth(), GetScreenHeight() };
     }
 
+    [[nodiscard]] utils::IntRect Window::area() const {
+        return utils::IntRect{ utils::Vec2i{}, size() };
+    }
+
+    void Window::set_resizable(bool const enabled) {
+        set_window_flag(FLAG_WINDOW_RESIZABLE, enabled);
+    }
+
+    [[nodiscard]] tl::optional<Font> Window::load_font(char const* filename, int font_size) {
+        auto const font = LoadFontEx(filename, font_size, nullptr, 0);
+        if (not IsFontReady(font) or font.texture.id == GetFontDefault().texture.id) {
+            return tl::nullopt;
+        }
+        return Font{ std::unique_ptr<::Font, Font::Deleter>{ new ::Font{ font } } };
+    }
+
     void Window::poll_events() {
         m_event_system.update();
+        if (IsWindowResized()) {
+            m_event_system.enqueue_event(ui::WindowResized{ area() });
+        }
     }
 
     [[nodiscard]] tl::optional<ui::Event> Window::next_event() {

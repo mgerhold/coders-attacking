@@ -32,6 +32,10 @@ namespace ui {
         return result;
     }
 
+    void EventSystem::enqueue_event(Event const& event) {
+        m_event_queue.emplace_back(event);
+    }
+
     void EventSystem::update_keyboard() {
         for (auto it = m_pressed_keys.begin(); it != m_pressed_keys.end();) {
             if (IsKeyReleased(static_cast<int>(*it))) {
