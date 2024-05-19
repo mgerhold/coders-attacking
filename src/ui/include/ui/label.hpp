@@ -14,9 +14,10 @@ namespace ui {
         std::shared_ptr<gfx::Font> m_font;
         int m_max_font_size;
         float m_font_size;
-        std::string m_wrapped_text;
+        std::vector<std::string> m_wrapped_text;
         Alignment m_alignment;
         VerticalAlignment m_vertical_alignment;
+        float m_line_height;
         utils::Vec2f m_text_size;
 
     public:
@@ -25,14 +26,20 @@ namespace ui {
               int const max_size,
               utils::Color const color,
               Alignment const alignment = Alignment::Left,
-              VerticalAlignment const vertical_alignment = VerticalAlignment::Top)
+              VerticalAlignment const vertical_alignment = VerticalAlignment::Top,
+              float const line_height = 1.2f)
             : m_caption{ std::move(caption) },
               m_color{ color },
               m_font{ std::move(font) },
               m_max_font_size{ max_size },
               m_font_size{ 1.0f },
               m_alignment{ alignment },
-              m_vertical_alignment{ vertical_alignment } { }
+              m_vertical_alignment{ vertical_alignment },
+              m_line_height{ line_height } {
+            if (line_height < 0.5f) {
+                throw std::invalid_argument{ "line height must be at least 0.5" };
+            }
+        }
 
         bool handle_event([[maybe_unused]] Event event) override {
             return false;
@@ -53,6 +60,6 @@ namespace ui {
 
     private:
         void recalculate_wrapping();
-        [[nodiscard]] bool does_fit(char const* text, int font_size, utils::Vec2f& out_text_size);
+        [[nodiscard]] bool does_fit(std::vector<std::string> lines, int font_size, utils::Vec2f& out_text_size);
     };
 } // namespace ui

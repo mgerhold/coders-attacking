@@ -2,8 +2,8 @@
 
 #include "layout.hpp"
 #include "ui/bumper.hpp"
+#include "ui/column_layout.hpp"
 #include "widget.hpp"
-
 #include <algorithm>
 #include <cassert>
 #include <memory>
@@ -19,6 +19,9 @@ namespace ui {
         std::vector<std::unique_ptr<Widget>> m_widgets;
 
     public:
+        explicit Panel(tl::optional<utils::Color> const color = tl::nullopt)
+            : Panel{ std::make_unique<ColumnLayout>(1), color } { }
+
         explicit Panel(std::unique_ptr<Layout> layout, tl::optional<utils::Color> const color = tl::nullopt)
             : m_color{ color },
               m_layout{ std::move(layout) } { }
@@ -39,6 +42,12 @@ namespace ui {
 
         [[nodiscard]] bool handle_event(Event const event) override {
             return std::ranges::any_of(m_widgets, [event](auto const& widget) { return widget->handle_event(event); });
+        }
+
+        void set_layout(std::unique_ptr<Layout> layout) {
+            m_layout = std::move(layout);
+            m_layout->recalculate(m_widgets.size());
+            recalculate_absolute_area(area());
         }
 
         void render(gfx::Renderer& renderer) const override;

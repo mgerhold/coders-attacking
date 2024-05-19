@@ -24,6 +24,8 @@ namespace gfx {
         [[nodiscard]] utils::IntRect area() const;
         void set_resizable(bool enabled);
 
+        [[nodiscard]] float delta_seconds() const;
+
         [[nodiscard]] Renderer renderer() {
             return Renderer{};
         }

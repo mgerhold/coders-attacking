@@ -35,6 +35,10 @@ namespace gfx {
         set_window_flag(FLAG_WINDOW_RESIZABLE, enabled);
     }
 
+    [[nodiscard]] float Window::delta_seconds() const {
+        return GetFrameTime();
+    }
+
     [[nodiscard]] tl::optional<Font> Window::load_font(char const* filename, int font_size) {
         auto const font = LoadFontEx(filename, font_size, nullptr, 0);
         if (not IsFontReady(font) or font.texture.id == GetFontDefault().texture.id) {
