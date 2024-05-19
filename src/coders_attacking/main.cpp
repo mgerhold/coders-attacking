@@ -19,32 +19,28 @@ int main() {
     auto const font = std::make_shared<gfx::Font>(std::move(roboto).value());
 
     auto user_interface_root = ui::Panel{
-        std::make_unique<ui::GridLayout>(3, 4),
+        std::make_unique<ui::GridLayout>(
+                7,
+                8,
+                ui::GridLayout::Area{ { 1, 6 }, { 2, 1 } },
+                ui::GridLayout::Area{ { 4, 6 }, { 2, 1 } }
+        ),
         Color::Brown,
     };
-    auto const on_click_handler = [](ui::Button const& button) {
-        spdlog::info("button with text \"{}\" has been clicked", button.caption());
-    };
-    user_interface_root.add_widgets<5>(
-            std::make_unique<ui::Button>("OK", font, on_click_handler),
-            std::make_unique<ui::Button>("Cancel", font, on_click_handler)
+    auto running = true;
+    user_interface_root.add_widgets(
+            std::make_unique<ui::Button>("OK", font, [](auto const&) { spdlog::info("OK"); }),
+            std::make_unique<ui::Button>("Cancel", font, [&running](auto const&) { running = false; })
     );
     user_interface_root.recalculate_absolute_area(window_area);
 
-    while (not window.should_close()) {
+    while (running and not window.should_close()) {
         window.poll_events();
         if (window.was_resized()) {
             user_interface_root.recalculate_absolute_area(window.area());
         }
         while (auto const event = window.next_event()) {
             std::ignore = user_interface_root.handle_event(event.value());
-            if (auto const key_pressed = get_if<ui::KeyPressed>(&*event)) {
-                spdlog::info("key pressed: {}", to_string(key_pressed->key));
-            } else if (auto const key_released = get_if<ui::KeyReleased>(&*event)) {
-                spdlog::info("key released: {}", to_string(key_released->key));
-            } else if (auto const mouse_wheel_moved = get_if<ui::MouseWheelMoved>(&*event)) {
-                spdlog::info("mouse wheel moved by ({},{})", mouse_wheel_moved->delta.x, mouse_wheel_moved->delta.y);
-            }
         }
         auto renderer = window.renderer();
         renderer.clear(Color::Beige);
