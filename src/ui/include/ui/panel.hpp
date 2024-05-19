@@ -40,8 +40,13 @@ namespace ui {
             m_layout->recalculate(m_widgets.size());
         }
 
-        [[nodiscard]] bool handle_event(Event const event) override {
-            return std::ranges::any_of(m_widgets, [event](auto const& widget) { return widget->handle_event(event); });
+        [[nodiscard]] HandleEventResult handle_event(Event const event) override {
+            for (auto const& widget : m_widgets) {
+                if (widget->handle_event(event) == HandleEventResult::EventHandled) {
+                    return HandleEventResult::EventHandled;
+                }
+            }
+            return HandleEventResult::EventNotHandled;
         }
 
         void set_layout(std::unique_ptr<Layout> layout) {

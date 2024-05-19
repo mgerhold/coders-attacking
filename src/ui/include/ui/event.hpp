@@ -44,4 +44,9 @@ namespace ui {
         MouseWheelMoved
     >;
     // clang-format on
+
+    enum class HandleEventResult {
+        EventHandled,
+        EventNotHandled,
+    };
 } // namespace ui

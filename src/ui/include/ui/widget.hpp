@@ -23,7 +23,7 @@ namespace ui {
         Widget& operator=(Widget&& other) noexcept = default;
         virtual ~Widget() = default;
 
-        [[nodiscard]] virtual bool handle_event(Event event) = 0;
+        [[nodiscard]] virtual HandleEventResult handle_event(Event event) = 0;
         virtual void render(gfx::Renderer& renderer) const = 0;
         virtual void recalculate_absolute_area(utils::IntRect const& outer_area);
     };

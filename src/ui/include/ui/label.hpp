@@ -41,8 +41,8 @@ namespace ui {
             }
         }
 
-        bool handle_event([[maybe_unused]] Event event) override {
-            return false;
+        HandleEventResult handle_event([[maybe_unused]] Event event) override {
+            return HandleEventResult::EventNotHandled;
         }
 
         void render(gfx::Renderer& renderer) const override;

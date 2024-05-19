@@ -26,16 +26,10 @@ public:
         StopUpdating,
     };
 
-    enum class HandleEventResult {
-        EventHandled,
-        EventNotHandled,
-    };
-
     [[nodiscard]] virtual UpdateResult update(float delta_seconds) = 0;
 
-    [[nodiscard]] virtual HandleEventResult handle_event(ui::Event const& event) {
-        return m_user_interface.handle_event(event) ? HandleEventResult::EventHandled
-                                                    : HandleEventResult::EventNotHandled;
+    [[nodiscard]] virtual ui::HandleEventResult handle_event(ui::Event const& event) {
+        return m_user_interface.handle_event(event);
     }
 
     virtual void render(gfx::Renderer& renderer) const {

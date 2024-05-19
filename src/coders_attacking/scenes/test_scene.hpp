@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../scene.hpp"
+#include <array>
 #include <game/galaxy.hpp>
 #include <ui/button.hpp>
 #include <ui/grid_layout.hpp>
@@ -11,6 +12,7 @@ class TestScene final : public Scene {
 private:
     Galaxy m_galaxy;
     std::shared_ptr<gfx::Font> m_font;
+    view::View m_game_view;
     bool m_running{ true };
 
 public:
@@ -34,8 +36,15 @@ public:
         return UpdateResult::KeepUpdating;
     }
 
+    [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event) override {
+        if (Scene::handle_event(event) == ui::HandleEventResult::EventHandled) {
+            return ui::HandleEventResult::EventHandled;
+        }
+        return m_game_view.handle_event(event);
+    }
+
     void render(gfx::Renderer& renderer) const override {
-        view::render_game(m_galaxy, viewport(), renderer, *m_font);
+        m_game_view.render_game(m_galaxy, viewport(), renderer, *m_font);
         Scene::render(renderer);
     }
 
@@ -56,6 +65,63 @@ private:
     }
 
     [[nodiscard]] static Galaxy create_galaxy() {
+        static constexpr auto planet_names = std::array{
+            "Mercury",
+            "Venus",
+            "Earth",
+            "Mars",
+            "Jupiter",
+            "Saturn",
+            "Uranus",
+            "Neptune",
+            "Proxima Centauri b",
+            "Kepler-186f",
+            "TRAPPIST-1e",
+            "Kepler-452b",
+            "GJ 1214 b",
+            "HD 209458 b",
+            "55 Cancri e",
+            "WASP-12b",
+            "Kepler-22b",
+            "Gliese 581d",
+            "Kepler-69c",
+            "Kepler-62f",
+            "Kepler-442b",
+            "Kepler-1649c",
+            "LHS 1140 b",
+            "HD 40307 g",
+            "Tau Ceti e",
+            "Ross 128 b",
+            "Wolf 1061 c",
+            "Luyten b",
+            "K2-18b",
+            "GJ 667 Cc",
+            "Teegarden's Star b",
+            "KELT-9b",
+            "GJ 357 d",
+            "HD 189733 b",
+            "55 Cancri f",
+            "Kepler-62e",
+            "Kepler-1229b",
+            "Kepler-1652b",
+            "Kepler-442b",
+            "Kepler-62c",
+            "Kepler-61b",
+            "Kapteyn b",
+            "K2-141b",
+            "GJ 876 d",
+            "HD 85512 b",
+            "EPIC 201238110.02",
+            "Kepler-22c",
+            "Kepler-37b",
+            "GJ 3293 d",
+            "HD 147379 b",
+            "K2-72e",
+            "HD 95086 b",
+            "HIP 65426 b",
+            "HR 8799 b",
+        };
+
         auto galaxy = Galaxy{};
         auto random = c2k::Random{};
         for (auto i = usize{ 0 }; i < galaxy.game_settings().num_planets; ++i) {
@@ -66,8 +132,8 @@ private:
             auto game_object = GameObject{};
             game_object.emplace_component<Transform>(position);
             auto const color = utils::Color::random(random);
-            spdlog::info("{},{},{},{}", color.r, color.g, color.b, color.a);
-            game_object.emplace_component<Planet>("Earth", 10, color);
+            auto const planet_name = planet_names.at(random.next_integral<usize>(planet_names.size()));
+            game_object.emplace_component<Planet>(planet_name, 10, color);
             galaxy.game_objects().push_back(game_object);
         }
         return galaxy;

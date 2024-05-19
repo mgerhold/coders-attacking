@@ -17,6 +17,7 @@ namespace gfx {
 
     Window::Window(utils::Vec2i const resolution, char const* const title) : m_window_handle{ std::monostate{} } {
         InitWindow(resolution.x, resolution.y, title);
+        SetExitKey(0);
     }
 
     [[nodiscard]] bool Window::should_close() const {

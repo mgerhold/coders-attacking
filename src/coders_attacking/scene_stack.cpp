@@ -34,7 +34,7 @@ void SceneStack::handle_event(ui::Event const& event) {
     using std::ranges::views::reverse;
     for (auto const& scene : m_scenes | reverse) {
         auto const result = scene->handle_event(event);
-        if (result == Scene::HandleEventResult::EventHandled) {
+        if (result == ui::HandleEventResult::EventHandled) {
             break;
         }
     }

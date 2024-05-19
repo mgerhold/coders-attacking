@@ -19,7 +19,7 @@ namespace ui {
                          utils::Color::Black, Alignment::Center, VerticalAlignment::Middle },
               m_on_click{ std::move(on_click) } { }
 
-        [[nodiscard]] bool handle_event(Event const event) override {
+        [[nodiscard]] HandleEventResult handle_event(Event const event) override {
             if (auto const mouse_moved = std::get_if<MouseMoved>(&event)) {
                 m_hover_is_active = area().contains(mouse_moved->position);
             } else if (auto const mouse_clicked = std::get_if<MouseClicked>(&event)) {
@@ -28,13 +28,14 @@ namespace ui {
                 }
             } else if (auto const mouse_released = std::get_if<MouseReleased>(&event)) {
                 if (m_click_started and mouse_released->button == MouseButton::Left) {
+                    m_click_started = false;
                     if (area().contains(mouse_released->position) and m_on_click) {
                         m_on_click(*this);
+                        return HandleEventResult::EventHandled;
                     }
-                    m_click_started = false;
                 }
             }
-            return false;
+            return HandleEventResult::EventNotHandled;
         }
 
         void render(gfx::Renderer& renderer) const override {

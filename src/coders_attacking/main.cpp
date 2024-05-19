@@ -1,16 +1,7 @@
 #include "scene_stack.hpp"
 #include "scenes/test_scene.hpp"
-#include "ui/bumper.hpp"
-#include "ui/button.hpp"
-#include "ui/column_layout.hpp"
-#include "ui/grid_layout.hpp"
-#include "ui/ingame_view.hpp"
-#include "ui/label.hpp"
-#include "ui/panel.hpp"
 #include <gfx/font.hpp>
 #include <gfx/window.hpp>
-#include <lib2k/random.hpp>
-#include <spdlog/spdlog.h>
 
 int main() {
     using namespace utils;

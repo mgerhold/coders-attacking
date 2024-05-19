@@ -5,8 +5,8 @@
 namespace ui {
     class Bumper : public Widget {
     public:
-        [[nodiscard]] bool handle_event(Event) override {
-            return false;
+        [[nodiscard]] HandleEventResult handle_event(Event) override {
+            return HandleEventResult::EventNotHandled;
         }
 
         void render(gfx::Renderer&) const override { }
