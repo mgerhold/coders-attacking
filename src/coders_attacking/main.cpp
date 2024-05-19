@@ -3,7 +3,7 @@
 #include "ui/panel.hpp"
 #include <iostream>
 #include <spdlog/spdlog.h>
-#include <view/window.hpp>
+#include <gfx/window.hpp>
 
 static constexpr auto lorem_ipsum =
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et "
@@ -16,7 +16,7 @@ static constexpr auto lorem_ipsum =
 int main() {
     using utils::Color;
     using utils::Vec2i;
-    auto window = Window{ 800, 600, "coders attacking" };
+    auto window = gfx::Window{ 800, 600, "coders attacking" };
     auto const window_area = utils::IntRect{ Vec2i{}, window.size() };
     auto label = ui::Label{
         utils::FloatRect{ { 0.1, 0.1 }, { 0.2, 0.2 } },

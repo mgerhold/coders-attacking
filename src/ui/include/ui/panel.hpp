@@ -39,7 +39,7 @@ namespace ui {
             return std::ranges::any_of(m_widgets, [event](auto const& widget) { return widget->handle_event(event); });
         }
 
-        void render(Renderer& renderer) const override;
+        void render(gfx::Renderer& renderer) const override;
 
         void recalculate_absolute_area(utils::IntRect const& outer_area) override {
             using std::ranges::views::zip;

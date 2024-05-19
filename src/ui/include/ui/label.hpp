@@ -16,6 +16,6 @@ namespace ui {
             return false;
         }
 
-        void render(Renderer& renderer) const override;
+        void render(gfx::Renderer& renderer) const override;
     };
 } // namespace ui

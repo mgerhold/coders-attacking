@@ -6,7 +6,7 @@ namespace ui {
           m_caption{ std::move(caption) },
           m_color{ color } { }
 
-    void Label::render(Renderer& renderer) const {
+    void Label::render(gfx::Renderer& renderer) const {
         renderer.draw_text(m_caption.c_str(), m_absolute_area.top_left, 20, m_color);
     }
 } // namespace ui

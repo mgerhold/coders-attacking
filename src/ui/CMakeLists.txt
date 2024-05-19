@@ -22,7 +22,7 @@ target_include_directories(ui
 target_link_libraries(ui
         PUBLIC
         utils
-        view
+        gfx
         PRIVATE
         coders_attacking_options
 )

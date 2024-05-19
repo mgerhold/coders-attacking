@@ -5,7 +5,7 @@ add_executable(coders_attacking
 target_link_libraries(coders_attacking
         PRIVATE
         game
-        view
+        gfx
 )
 
 target_link_system_libraries(coders_attacking
