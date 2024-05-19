@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../scene.hpp"
+#include <algorithm>
 #include <array>
 #include <game/galaxy.hpp>
 #include <ui/button.hpp>
@@ -125,6 +126,12 @@ private:
 
         auto galaxy = Galaxy{};
         auto random = c2k::Random{};
+        auto shuffled_planet_names = std::vector<std::string>{ planet_names.begin(), planet_names.end() };
+        std::shuffle(
+                shuffled_planet_names.begin(),
+                shuffled_planet_names.end(),
+                std::mt19937{ std::random_device{}() }
+        );
         for (auto i = usize{ 0 }; i < galaxy.game_settings().num_planets; ++i) {
             auto const position = utils::Vec2f{
                 random.next_float() * galaxy.game_settings().map_size.x,
@@ -133,8 +140,9 @@ private:
             auto game_object = GameObject{};
             game_object.emplace_component<Transform>(position);
             auto const color = utils::Color::random(random);
-            auto const planet_name = planet_names.at(random.next_integral<usize>(planet_names.size()));
-            game_object.emplace_component<Planet>(planet_name, 10, color);
+            assert(i < shuffled_planet_names.size());
+            auto planet_name = shuffled_planet_names.at(i);
+            game_object.emplace_component<Planet>(std::move(planet_name), 10, color);
             galaxy.game_objects().push_back(game_object);
         }
         return galaxy;
