@@ -29,7 +29,7 @@ namespace gfx {
         }
 
         [[nodiscard]] tl::optional<Font> load_font(char const* filename, int font_size);
-
+        [[nodiscard]] bool was_resized() const;
         void poll_events();
 
         [[nodiscard]] tl::optional<ui::Event> next_event();

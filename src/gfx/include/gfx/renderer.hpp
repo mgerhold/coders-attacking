@@ -26,5 +26,13 @@ namespace gfx {
         void clear(utils::Color color);
         void draw_text(Font const& font, char const* text, utils::Vec2i position, float size, utils::Color color);
         void draw_filled_rectangle(utils::IntRect const& area, utils::Color color);
+        void draw_filled_rounded_rectangle(utils::IntRect const& area, float roundness, int segments, utils::Color color);
+        void draw_rounded_rectangle_outline(
+                utils::IntRect const& area,
+                float roundness,
+                int segments,
+                float line_thickness,
+                utils::Color color
+        );
     };
 } // namespace gfx

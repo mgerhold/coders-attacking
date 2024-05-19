@@ -13,7 +13,11 @@ namespace ui {
     public:
         GridLayout(usize const num_rows, usize const num_columns)
             : m_num_rows{ num_rows },
-              m_num_columns{ num_columns } { }
+              m_num_columns{ num_columns } {
+            if (num_rows == 0 or num_columns == 0) {
+                throw std::invalid_argument{ "need at least one row and one column in GridLayout" };
+            }
+        }
 
         void recalculate(usize const num_sub_areas) override {
             using namespace utils;

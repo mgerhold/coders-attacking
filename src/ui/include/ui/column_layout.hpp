@@ -1,6 +1,7 @@
 #pragma once
 
 #include "layout.hpp"
+#include <stdexcept>
 #include <utils/math.hpp>
 
 namespace ui {
@@ -9,7 +10,11 @@ namespace ui {
         usize m_num_columns;
 
     public:
-        explicit ColumnLayout(usize const num_columns) : m_num_columns{ num_columns } { }
+        explicit ColumnLayout(usize const num_columns) : m_num_columns{ num_columns } {
+            if (num_columns == 0) {
+                throw std::invalid_argument{ "need at least one column in ColumnLayout" };
+            }
+        }
 
         void recalculate(usize const num_sub_areas) override {
             using namespace utils;

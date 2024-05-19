@@ -34,10 +34,6 @@ namespace ui {
         utils::Vec2f delta;
     };
 
-    struct WindowResized final {
-        utils::IntRect new_area;
-    };
-
     // clang-format off
     using Event = std::variant<
         KeyPressed,
@@ -45,8 +41,7 @@ namespace ui {
         MouseClicked,
         MouseReleased,
         MouseMoved,
-        MouseWheelMoved,
-        WindowResized
+        MouseWheelMoved
     >;
     // clang-format on
 } // namespace ui

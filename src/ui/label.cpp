@@ -34,15 +34,17 @@ namespace ui {
 
     void Label::recalculate_absolute_area(utils::IntRect const& outer_area) {
         Widget::recalculate_absolute_area(outer_area);
-        recalculate();
+        recalculate_wrapping();
     }
 
-    void Label::recalculate() {
+    void Label::recalculate_wrapping() {
         auto const parts = c2k::split(m_caption, " ");
         assert(not parts.empty());
 
         auto font_size = m_max_font_size;
+        auto last_try = std::string{};
         while (font_size > 1) {
+            last_try.clear();
             auto it = parts.cbegin();
             auto line = *it;
             if (not does_fit(line.c_str(), font_size, m_text_size)) {
@@ -70,6 +72,7 @@ namespace ui {
                         // even the first word on this line does not fit
                         // -> reduce font size and try again from the start
                         --font_size;
+                        last_try = std::move(line);
                         break;
                     }
                     // the current word does not fit, but it's not the first word
@@ -90,8 +93,10 @@ namespace ui {
                 }
             }
         }
-        // not everything fits, but we cannot go any smaller
+
+        // not everything fits, but we cannot go any smaller -> trim the text so that it just fits
         m_font_size = static_cast<float>(std::max(font_size, 1));
+        m_wrapped_text = std::move(last_try);
     }
 
     bool Label::does_fit(char const* const text, int const font_size, utils::Vec2f& out_text_size) {

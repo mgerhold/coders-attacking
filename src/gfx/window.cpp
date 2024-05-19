@@ -43,11 +43,12 @@ namespace gfx {
         return Font{ std::unique_ptr<::Font, Font::Deleter>{ new ::Font{ font } } };
     }
 
+    [[nodiscard]] bool Window::was_resized() const {
+        return IsWindowResized();
+    }
+
     void Window::poll_events() {
         m_event_system.update();
-        if (IsWindowResized()) {
-            m_event_system.enqueue_event(ui::WindowResized{ area() });
-        }
     }
 
     [[nodiscard]] tl::optional<ui::Event> Window::next_event() {

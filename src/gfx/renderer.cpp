@@ -5,6 +5,10 @@
     return Color{ color.r, color.g, color.b, color.a };
 }
 
+[[nodiscard]] static Rectangle to_raylib(utils::FloatRect const& rect) {
+    return Rectangle{ rect.top_left.x, rect.top_left.y, rect.size.x, rect.size.y };
+}
+
 namespace gfx {
     void Renderer::Deleter::operator()(std::monostate) const {
         EndDrawing();
@@ -30,12 +34,39 @@ namespace gfx {
                 text,
                 ::Vector2{ static_cast<float>(position.x), static_cast<float>(position.y) },
                 size,
-                1.0f,
+                0.0f,
                 to_raylib(color)
         );
     }
 
     void Renderer::draw_filled_rectangle(utils::IntRect const& area, utils::Color const color) {
         DrawRectangle(area.top_left.x, area.top_left.y, area.size.x, area.size.y, to_raylib(color));
+    }
+
+    // clang-format off
+    void Renderer::draw_filled_rounded_rectangle(
+        utils::IntRect const& area,
+        float const roundness,
+        int const segments,
+        utils::Color const color
+    ) { // clang-format on
+        DrawRectangleRounded(to_raylib(utils::FloatRect{ area }), roundness, segments, to_raylib(color));
+    }
+
+    // clang-format off
+    void Renderer::draw_rounded_rectangle_outline(
+            utils::IntRect const& area,
+            float const roundness,
+            int const segments,
+            float const line_thickness,
+            utils::Color const color
+    ) { // clang-format on
+        DrawRectangleRoundedLines(
+                to_raylib(utils::FloatRect{ area }),
+                roundness,
+                segments,
+                line_thickness,
+                to_raylib(color)
+        );
     }
 } // namespace gfx

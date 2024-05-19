@@ -42,8 +42,17 @@ namespace ui {
 
         void recalculate_absolute_area(utils::IntRect const& outer_area) override;
 
+        [[nodiscard]] std::string const& caption() const {
+            return m_caption;
+        }
+
+        void caption(std::string caption) {
+            m_caption = std::move(caption);
+            recalculate_wrapping();
+        }
+
     private:
-        void recalculate();
+        void recalculate_wrapping();
         [[nodiscard]] bool does_fit(char const* text, int font_size, utils::Vec2f& out_text_size);
     };
 } // namespace ui

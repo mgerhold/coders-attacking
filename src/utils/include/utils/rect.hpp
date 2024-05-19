@@ -45,8 +45,39 @@ namespace utils {
             return Rect{ Vec2<T>{ new_top_left }, Vec2<T>{ Vec2f{ size } * factor } };
         }
 
+        [[nodiscard]] constexpr Rect inset(T const amount) {
+            return Rect{
+                Vec2<T>{
+                        top_left.x + amount,
+                        top_left.y + amount,
+                        },
+                Vec2<T>{
+                        size.x - 2 * amount,
+                        size.y - 2 * amount,
+                        },
+            };
+        }
+
+        [[nodiscard]] constexpr Rect shrink(Vec2<T> const amount) {
+            return Rect{ top_left, size - amount };
+        }
+
+        [[nodiscard]] constexpr Rect move(Vec2<T> const offset) {
+            return Rect{ top_left + offset, size };
+        }
+
         [[nodiscard]] constexpr Vec2<T> center() const {
             return top_left + size / T{ 2 };
+        }
+
+        [[nodiscard]] constexpr bool contains(Vec2<T> const position) {
+            // clang-format off
+            return
+                position.x >= top_left.x
+                and position.x < top_left.x + size.x
+                and position.y >= top_left.y
+                and position.y < top_left.y + size.y;
+            // clang-format on
         }
     };
 
