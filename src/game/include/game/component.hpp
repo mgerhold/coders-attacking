@@ -8,4 +8,4 @@
 using Component = std::variant<Planet, Transform>;
 
 template<typename T>
-concept IsComponent = c2k::IsOneOf<Planet, Transform>;
+concept IsComponent = c2k::IsOneOf<T, Planet, Transform>;

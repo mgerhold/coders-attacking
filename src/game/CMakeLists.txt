@@ -17,6 +17,7 @@ target_link_system_libraries(game
         tl::expected
         tl::optional
         lib2k
+        spdlog::spdlog
 )
 
 target_include_directories(game

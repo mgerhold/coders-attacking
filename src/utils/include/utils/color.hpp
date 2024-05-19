@@ -1,6 +1,8 @@
 #pragma once
 
+#include <lib2k/random.hpp>
 #include <lib2k/types.hpp>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 
 namespace utils {
@@ -42,7 +44,7 @@ namespace utils {
         using enum Constant;
 
         constexpr Color() = default;
-        constexpr Color(u8 const r, u8 const g, u8 const b) : r{ r }, g{ g }, b{ b } { }
+        constexpr Color(u8 const r, u8 const g, u8 const b) : r{ r }, g{ g }, b{ b }, a{ 255 } { }
         constexpr Color(u8 const r, u8 const g, u8 const b, u8 const a) : r{ r }, g{ g }, b{ b }, a{ a } { }
 
         constexpr Color(Constant const color) { // NOLINT
@@ -127,6 +129,13 @@ namespace utils {
                     *this = { 0, 0, 0, 255 };
                     break;
             }
+        }
+
+        [[nodiscard]] static Color random(c2k::Random& random) {
+            auto const r = static_cast<u8>(random.next_integral<int>(0, 256));
+            auto const g = static_cast<u8>(random.next_integral<int>(0, 256));
+            auto const b = static_cast<u8>(random.next_integral<int>(0, 256));
+            return Color{ r, g, b };
         }
     };
 } // namespace utils

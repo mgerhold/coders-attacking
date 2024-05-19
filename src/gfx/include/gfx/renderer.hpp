@@ -34,5 +34,6 @@ namespace gfx {
                 float line_thickness,
                 utils::Color color
         );
+        void draw_circle(utils::Vec2i center, float radius, utils::Color color);
     };
 } // namespace gfx

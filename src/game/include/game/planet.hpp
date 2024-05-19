@@ -6,4 +6,5 @@
 struct Planet {
     std::string name;
     usize production_per_turn;
+    utils::Color color;
 };

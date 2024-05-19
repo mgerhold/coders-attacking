@@ -5,5 +5,12 @@
 #include <game/galaxy.hpp>
 
 namespace view {
-    void render_game(Galaxy const& galaxy, utils::IntRect const& viewport, gfx::Renderer& renderer);
-}
+    // clang-format off
+    void render_game(
+        Galaxy const& galaxy,
+        utils::IntRect const& viewport,
+        gfx::Renderer& renderer,
+        gfx::Font const& font
+    );
+    // clang-format on
+} // namespace view
