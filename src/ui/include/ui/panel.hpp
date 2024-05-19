@@ -19,7 +19,7 @@ namespace ui {
         std::vector<std::unique_ptr<Widget>> m_widgets;
 
     public:
-        Panel(std::unique_ptr<Layout> layout, tl::optional<utils::Color> const color = tl::nullopt)
+        explicit Panel(std::unique_ptr<Layout> layout, tl::optional<utils::Color> const color = tl::nullopt)
             : m_color{ color },
               m_layout{ std::move(layout) } { }
 
@@ -51,8 +51,8 @@ namespace ui {
             auto const& sub_areas = m_layout->sub_areas();
             assert(sub_areas.size() == m_widgets.size());
             for (auto const& [widget, area] : zip(m_widgets, sub_areas)) {
-                auto const absolute_sub_area = IntRect{ FloatRect{ absolute_area() }.relative_to_absolute_rect(area) };
-                widget->recalculate_absolute_area(absolute_sub_area);
+                auto const sub_area = IntRect{ FloatRect{ this->area() }.relative_to_absolute_rect(area) };
+                widget->recalculate_absolute_area(sub_area);
             }
         }
     };

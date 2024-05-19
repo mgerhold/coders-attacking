@@ -21,14 +21,14 @@ namespace ui {
 
         [[nodiscard]] bool handle_event(Event const event) override {
             if (auto const mouse_moved = std::get_if<MouseMoved>(&event)) {
-                m_hover_is_active = absolute_area().contains(mouse_moved->position);
+                m_hover_is_active = area().contains(mouse_moved->position);
             } else if (auto const mouse_clicked = std::get_if<MouseClicked>(&event)) {
-                if (mouse_clicked->button == MouseButton::Left and absolute_area().contains(mouse_clicked->position)) {
+                if (mouse_clicked->button == MouseButton::Left and area().contains(mouse_clicked->position)) {
                     m_click_started = true;
                 }
             } else if (auto const mouse_released = std::get_if<MouseReleased>(&event)) {
                 if (m_click_started and mouse_released->button == MouseButton::Left) {
-                    if (absolute_area().contains(mouse_released->position) and m_on_click) {
+                    if (area().contains(mouse_released->position) and m_on_click) {
                         m_on_click(*this);
                     }
                     m_click_started = false;
@@ -47,16 +47,16 @@ namespace ui {
                 }
                 return utils::Color::LightGray;
             });
-            auto const background_area = absolute_area().move({ 1, 0 }).shrink({ 1, 1 });
+            auto const background_area = area().move({ 1, 0 }).shrink({ 1, 1 });
             renderer.draw_filled_rounded_rectangle(background_area, 0.05f, 4, color);
-            auto const outline_area = absolute_area().move({ 2, 1 }).shrink({ 3, 3 });
+            auto const outline_area = area().move({ 2, 1 }).shrink({ 3, 3 });
             renderer.draw_rounded_rectangle_outline(outline_area, 0.05f, 4, 1, utils::Color::Black);
             m_caption.render(renderer);
         }
 
         void recalculate_absolute_area(utils::IntRect const& outer_area) override {
             Widget::recalculate_absolute_area(outer_area);
-            auto const label_area = absolute_area().scaled_from_center(0.9f);
+            auto const label_area = area().scaled_from_center(0.9f);
             m_caption.recalculate_absolute_area(label_area);
         }
 

@@ -2,6 +2,7 @@
 #include "ui/button.hpp"
 #include "ui/column_layout.hpp"
 #include "ui/grid_layout.hpp"
+#include "ui/ingame_view.hpp"
 #include "ui/label.hpp"
 #include "ui/panel.hpp"
 #include <gfx/font.hpp>
@@ -22,6 +23,7 @@ int main() {
         std::make_unique<ui::GridLayout>(
                 7,
                 8,
+                ui::GridLayout::Area{ { 0, 0 }, { 7, 5 } },
                 ui::GridLayout::Area{ { 1, 6 }, { 2, 1 } },
                 ui::GridLayout::Area{ { 4, 6 }, { 2, 1 } }
         ),
@@ -29,6 +31,7 @@ int main() {
     };
     auto running = true;
     user_interface_root.add_widgets(
+            std::make_unique<ui::IngameView>(),
             std::make_unique<ui::Button>("OK", font, [](auto const&) { spdlog::info("OK"); }),
             std::make_unique<ui::Button>("Cancel", font, [&running](auto const&) { running = false; })
     );

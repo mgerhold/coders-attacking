@@ -16,6 +16,7 @@ add_library(ui STATIC
         include/ui/grid_layout.hpp
         include/ui/bumper.hpp
         include/ui/alignment.hpp
+        include/ui/ingame_view.hpp
 )
 
 target_include_directories(ui

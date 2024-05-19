@@ -8,11 +8,11 @@
 namespace ui {
     class Widget {
     private:
-        utils::IntRect m_absolute_area;
+        utils::IntRect m_area;
 
     protected:
-        [[nodiscard]] utils::IntRect absolute_area() const {
-            return m_absolute_area;
+        [[nodiscard]] utils::IntRect area() const {
+            return m_area;
         }
 
     public:

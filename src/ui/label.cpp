@@ -8,11 +8,11 @@ namespace ui {
         auto const x = std::invoke([&] {
             switch (m_alignment) {
                 case Alignment::Left:
-                    return absolute_area().top_left.x;
+                    return area().top_left.x;
                 case Alignment::Center:
-                    return absolute_area().top_left.x + (absolute_area().size.x - static_cast<int>(m_text_size.x)) / 2;
+                    return area().top_left.x + (area().size.x - static_cast<int>(m_text_size.x)) / 2;
                 case Alignment::Right:
-                    return absolute_area().top_left.x + (absolute_area().size.x - static_cast<int>(m_text_size.x));
+                    return area().top_left.x + (area().size.x - static_cast<int>(m_text_size.x));
             }
             assert(false and "unreachable");
             return 0;
@@ -20,11 +20,11 @@ namespace ui {
         auto const y = std::invoke([&] {
             switch (m_vertical_alignment) {
                 case VerticalAlignment::Top:
-                    return absolute_area().top_left.y;
+                    return area().top_left.y;
                 case VerticalAlignment::Middle:
-                    return absolute_area().top_left.y + (absolute_area().size.y - static_cast<int>(m_text_size.y)) / 2;
+                    return area().top_left.y + (area().size.y - static_cast<int>(m_text_size.y)) / 2;
                 case VerticalAlignment::Bottom:
-                    return absolute_area().top_left.y + (absolute_area().size.y - static_cast<int>(m_text_size.y));
+                    return area().top_left.y + (area().size.y - static_cast<int>(m_text_size.y));
             }
             assert(false and "unreachable");
             return 0;
@@ -100,7 +100,7 @@ namespace ui {
     }
 
     bool Label::does_fit(char const* const text, int const font_size, utils::Vec2f& out_text_size) {
-        auto const max_area = utils::Vec2f{ absolute_area().size };
+        auto const max_area = utils::Vec2f{ area().size };
         auto const area = m_font->measure_text(text, static_cast<float>(font_size));
         out_text_size = area;
         return area.x <= max_area.x and area.y <= max_area.y;
