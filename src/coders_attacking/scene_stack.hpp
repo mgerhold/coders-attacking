@@ -25,7 +25,7 @@ public:
     }
 
     void update(ui::EventSystem const& event_system, float delta_seconds);
-    void handle_event(ui::Event const& event);
+    void handle_event(ui::Event const& event, ui::EventSystem const& event_system);
     void render(gfx::Renderer& renderer) const;
     void recalculate_layout(utils::IntRect area);
 

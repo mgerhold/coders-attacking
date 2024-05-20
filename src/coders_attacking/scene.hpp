@@ -28,7 +28,11 @@ public:
 
     [[nodiscard]] virtual UpdateResult update(ui::EventSystem const& event_system, float delta_seconds) = 0;
 
-    [[nodiscard]] virtual ui::HandleEventResult handle_event(ui::Event const& event) {
+    // clang-format off
+    [[nodiscard]] virtual ui::HandleEventResult handle_event(
+        ui::Event const& event,
+        ui::EventSystem const& event_system
+    ) { // clang-format on
         return m_user_interface.handle_event(event);
     }
 

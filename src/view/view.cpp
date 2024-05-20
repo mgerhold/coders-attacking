@@ -63,10 +63,16 @@ namespace view {
         }
     }
 
-    [[nodiscard]] ui::HandleEventResult View::handle_event(ui::Event const& event) {
+    // clang-format off
+    [[nodiscard]] ui::HandleEventResult View::handle_event(
+        ui::Event const& event,
+        ui::EventSystem const& event_system
+    ) { // clang-format on
         if (auto const mouse_wheel_moved = std::get_if<ui::MouseWheelMoved>(&event)) {
-            m_camera.zoom(1.0f + mouse_wheel_moved->delta.y * 0.1f);
-            return ui::HandleEventResult::EventHandled;
+            if (m_camera.viewport().contains(event_system.mouse_position())) {
+                m_camera.zoom(1.0f + mouse_wheel_moved->delta.y * 0.1f);
+                return ui::HandleEventResult::EventHandled;
+            }
         }
         if (auto const key_pressed = std::get_if<ui::KeyPressed>(&event)) {
             switch (key_pressed->key) { // NOLINT (not all cases handled)

@@ -24,7 +24,7 @@ int main() {
             scene_stack.recalculate_layout(window.area());
         }
         while (auto const event = window.next_event()) {
-            scene_stack.handle_event(event.value());
+            scene_stack.handle_event(event.value(), window.event_system());
         }
         scene_stack.update(window.event_system(), window.delta_seconds());
         auto renderer = window.renderer();

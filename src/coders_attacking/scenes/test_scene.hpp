@@ -44,11 +44,12 @@ public:
         return UpdateResult::KeepUpdating;
     }
 
-    [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event) override {
-        if (Scene::handle_event(event) == ui::HandleEventResult::EventHandled) {
+    [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event, ui::EventSystem const& event_system)
+            override {
+        if (Scene::handle_event(event, event_system) == ui::HandleEventResult::EventHandled) {
             return ui::HandleEventResult::EventHandled;
         }
-        return m_game_view.handle_event(event);
+        return m_game_view.handle_event(event, event_system);
     }
 
     void render(gfx::Renderer& renderer) const override {

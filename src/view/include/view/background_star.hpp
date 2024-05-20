@@ -51,7 +51,10 @@ namespace view {
                 static_cast<u8>(static_cast<float>(m_color.g) * brightness),
                 static_cast<u8>(static_cast<float>(m_color.b) * brightness),
             };
-            auto const screen_coords = camera.world_to_screen_coords(m_position, m_distance);
+            auto const position =
+                    m_position
+                    + Vec2f{ std::sin(elapsed_time / 5.0f), std::cos(elapsed_time / 3.0f) } * 0.001f / m_distance;
+            auto const screen_coords = camera.world_to_screen_coords(position, m_distance);
             if (not camera.viewport().contains(screen_coords)) {
                 return;
             }
@@ -67,7 +70,7 @@ namespace view {
             auto const brightness = random.next_float() * 0.5f + 0.1f;
             auto const period = random.next_float() * 10.0f + 5.0f;
             auto const amplitude = random.next_float() * 0.4f;
-            auto const distance = random.next_float() * 10.0f + 0.1f;
+            auto const distance = random.next_float() * 10.0f + 0.5f;
             auto const planet_type = random.next_integral<int>(3);
             auto const color = std::invoke([&] {
                 switch (planet_type) {

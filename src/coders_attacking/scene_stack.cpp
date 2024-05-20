@@ -30,10 +30,10 @@ void SceneStack::update(ui::EventSystem const& event_system, float const delta_s
     std::move(scenes_to_enqueue.begin(), scenes_to_enqueue.end(), std::back_inserter(m_scenes));
 }
 
-void SceneStack::handle_event(ui::Event const& event) {
+void SceneStack::handle_event(ui::Event const& event, ui::EventSystem const& event_system) {
     using std::ranges::views::reverse;
     for (auto const& scene : m_scenes | reverse) {
-        auto const result = scene->handle_event(event);
+        auto const result = scene->handle_event(event, event_system);
         if (result == ui::HandleEventResult::EventHandled) {
             break;
         }

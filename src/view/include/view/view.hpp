@@ -22,7 +22,7 @@ namespace view {
 
         void render_game(Galaxy const& galaxy, gfx::Renderer& renderer, gfx::Font const& font) const;
 
-        [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event);
+        [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event, ui::EventSystem const& event_system);
 
         void update(Galaxy const& galaxy, ui::EventSystem const& event_system, float delta_seconds);
 
