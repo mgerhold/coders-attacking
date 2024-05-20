@@ -4,6 +4,7 @@
 
 
 #include <algorithm>
+#include <spdlog/spdlog.h>
 #include <utils/vec2.hpp>
 
 namespace view {
@@ -14,12 +15,17 @@ namespace view {
         float m_min_zoom;
         float m_max_zoom;
         utils::IntRect m_viewport;
+        utils::FloatRect m_boundaries;
 
     public:
-        Camera(float const min_zoom, float const max_zoom, utils::IntRect const viewport)
+        Camera(float const min_zoom,
+               float const max_zoom,
+               utils::IntRect const viewport,
+               utils::FloatRect const boundaries)
             : m_min_zoom{ min_zoom },
               m_max_zoom{ max_zoom },
-              m_viewport{ viewport } {
+              m_viewport{ viewport },
+              m_boundaries{ boundaries } {
             if (max_zoom < min_zoom) {
                 throw std::invalid_argument{ "max_zoom cannot be less then min_zoom" };
             }
@@ -33,16 +39,26 @@ namespace view {
             return m_viewport;
         }
 
+        [[nodiscard]] utils::FloatRect visible_rect() const {
+            auto const top_left = view_to_world_coords(utils::Vec2f{});
+            auto const bottom_right = view_to_world_coords(utils::Vec2f{ 1.0f, 1.0f });
+            auto const size = bottom_right - top_left;
+            return utils::FloatRect{ top_left, size };
+        }
+
         void move(utils::Vec2f const offset) {
             m_offset += offset;
+            clamp_inside_boundaries();
         }
 
         void set_to_position(utils::Vec2f const position) {
             m_offset = position;
+            clamp_inside_boundaries();
         }
 
         void reset_position() {
             set_to_position(utils::Vec2f{});
+            clamp_inside_boundaries();
         }
 
         void zoom(float const factor) {
@@ -50,6 +66,7 @@ namespace view {
             auto const actual_factor = new_zoom / m_zoom;
             m_zoom = new_zoom;
             m_offset *= actual_factor;
+            clamp_inside_boundaries();
         }
 
         void set_zoom(float const value) {
@@ -57,10 +74,12 @@ namespace view {
             auto const factor = new_zoom / m_zoom;
             m_zoom = new_zoom;
             m_offset *= factor;
+            clamp_inside_boundaries();
         }
 
         void reset_zoom() {
             set_zoom(1.0f);
+            clamp_inside_boundaries();
         }
 
         // clang-format off
@@ -84,5 +103,22 @@ namespace view {
         [[nodiscard]] utils::Vec2f view_to_world_coords(utils::Vec2f view_coords) const;
 
         [[nodiscard]] utils::Vec2f screen_to_world_coords(utils::Vec2i screen_coords) const;
+
+    private:
+        void clamp_inside_boundaries() {
+            auto const visible = visible_rect();
+            if (auto const x_offset = m_boundaries.top_left.x - visible.top_left.x; x_offset > 0.0f) {
+                m_offset.x += x_offset;
+            }
+            if (auto const x_offset = visible.bottom_right().x - m_boundaries.bottom_right().x; x_offset > 0.0f) {
+                m_offset.x -= x_offset;
+            }
+            if (auto const y_offset = m_boundaries.top_left.y - visible.top_left.y; y_offset > 0.0f) {
+                m_offset.y += y_offset;
+            }
+            if (auto const y_offset = visible.bottom_right().y - m_boundaries.bottom_right().y; y_offset > 0.0f) {
+                m_offset.y -= y_offset;
+            }
+        }
     };
 } // namespace view

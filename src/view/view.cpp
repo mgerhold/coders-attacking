@@ -11,7 +11,13 @@
 namespace view {
     using namespace utils;
 
-    View::View(IntRect const viewport) : m_camera{ 0.9f, 4.0f, viewport } {
+    View::View(IntRect const viewport)
+        : m_camera{
+              0.9f,
+              4.0f,
+              viewport,
+              FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.2f),
+          } {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
         auto random = c2k::Random{};
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
@@ -114,7 +120,6 @@ namespace view {
         if (not a_planet_is_focused) {
             m_focused_planet = tl::nullopt;
         }
-
         m_elapsed_time += delta_seconds;
     }
 } // namespace view

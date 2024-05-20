@@ -27,6 +27,10 @@ namespace utils {
             : top_left{ static_cast<T>(other.top_left.x), static_cast<T>(other.top_left.y) },
               size{ static_cast<T>(other.size.x), static_cast<T>(other.size.y) } { }
 
+        [[nodiscard]] constexpr Vec2<T> bottom_right() const {
+            return top_left + size;
+        }
+
         [[nodiscard]] constexpr Vec2<T> relative_to_absolute_position(Vec2<T> const relative_position) const {
             return top_left + size.hadamard_product(relative_position);
         }
