@@ -41,7 +41,10 @@ namespace view {
         }
 
         void set_zoom(float const value) {
-            m_zoom = std::clamp(value, m_min_zoom, m_max_zoom);
+            auto const new_zoom = std::clamp(value, m_min_zoom, m_max_zoom);
+            auto const factor = new_zoom / m_zoom;
+            m_zoom = new_zoom;
+            m_offset *= factor;
         }
 
         void reset_zoom() {

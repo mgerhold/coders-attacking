@@ -62,6 +62,13 @@ namespace view {
             m_camera.zoom(1.0f + mouse_wheel_moved->delta.y * 0.1f);
             return ui::HandleEventResult::EventHandled;
         }
+        if (auto const key_pressed = std::get_if<ui::KeyPressed>(&event)) {
+            switch (key_pressed->key) { // NOLINT (not all cases handled)
+                case ui::Key::Space:
+                    m_camera.reset_zoom();
+                    break;
+            }
+        }
         return ui::HandleEventResult::EventNotHandled;
     }
 
