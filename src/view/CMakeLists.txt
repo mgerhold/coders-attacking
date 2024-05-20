@@ -1,6 +1,9 @@
 add_library(view STATIC
         include/view/view.hpp
         view.cpp
+        include/view/camera.hpp
+        camera.cpp
+        include/view/background_star.hpp
 )
 
 target_include_directories(view

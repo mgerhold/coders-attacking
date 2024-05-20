@@ -46,7 +46,12 @@ public:
     }
 
     void render(gfx::Renderer& renderer) const override {
-        m_game_view.render_game(m_galaxy, viewport(), renderer, *m_font);
+        auto const size = viewport().size;
+        auto const game_viewport = utils::IntRect{
+            utils::Vec2i{      size.x / 16,                0 },
+            utils::Vec2i{ size.x * 15 / 16, size.y * 11 / 12 },
+        };
+        m_game_view.render_game(m_galaxy, game_viewport, renderer, *m_font);
         Scene::render(renderer);
     }
 
@@ -139,8 +144,8 @@ private:
         );
         for (auto i = usize{ 0 }; i < galaxy.game_settings().num_planets; ++i) {
             auto const position = utils::Vec2f{
-                random.next_float() * galaxy.game_settings().map_size.x,
-                random.next_float() * galaxy.game_settings().map_size.y,
+                random.next_float() - 0.5f,
+                random.next_float() - 0.5f,
             };
             auto game_object = GameObject{};
             game_object.emplace_component<Transform>(position);

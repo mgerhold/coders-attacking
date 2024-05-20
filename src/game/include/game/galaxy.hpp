@@ -4,7 +4,6 @@
 #include <lib2k/types.hpp>
 
 struct GameSettings {
-    utils::Vec2f map_size{ 100.0f, 100.0f };
     usize num_planets{ 20 };
 };
 
