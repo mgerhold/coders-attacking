@@ -9,7 +9,9 @@
 #include <view/view.hpp>
 
 namespace view {
-    View::View(utils::IntRect const viewport) : m_camera{ 0.9f, 4.0f, viewport } {
+    using namespace utils;
+
+    View::View(IntRect const viewport) : m_camera{ 0.9f, 4.0f, viewport } {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
         auto random = c2k::Random{};
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
@@ -67,7 +69,7 @@ namespace view {
         return ui::HandleEventResult::EventNotHandled;
     }
 
-    void View::update(ui::EventSystem const& event_system, float const delta_seconds) {
+    void View::update(Galaxy const& galaxy, ui::EventSystem const& event_system, float const delta_seconds) {
         static constexpr auto scroll_speed = 0.1f;
         static constexpr auto zoom_factor = 1.2f;
         if (event_system.is_key_down(ui::Key::Left)) {
@@ -88,11 +90,31 @@ namespace view {
         if (event_system.is_key_down(ui::Key::KpSubtract)) {
             m_camera.zoom(-(zoom_factor - 1.0f) * delta_seconds + 1.0f);
         }
-        spdlog::info("mouse position: {},{}", event_system.mouse_position().x, event_system.mouse_position().y);
-        auto const view_coords = m_camera.screen_to_view_coords(event_system.mouse_position());
-        spdlog::info("view coords: {},{}", view_coords.x, view_coords.y);
-        auto const world_coords = m_camera.view_to_world_coords(view_coords);
-        spdlog::info("world coords: {},{}", world_coords.x, world_coords.y);
+        if (event_system.is_mouse_button_down(ui::MouseButton::Right)
+            and m_camera.viewport().contains(event_system.mouse_position())) {
+            auto const size = Vec2f{ m_camera.viewport().size };
+            auto const offset =
+                    Vec2f{ event_system.mouse_delta() }.hadamard_product(Vec2f{ 1.0f / size.x, 1.0f / size.y });
+            m_camera.move(-offset);
+        }
+        auto const mouse_position = Vec2f{ event_system.mouse_position() };
+        auto a_planet_is_focused = false;
+        for (auto const& game_object : galaxy.game_objects()) {
+            if ([[maybe_unused]] auto const planet = game_object.get_component<Planet>()) {
+                auto const& transform = game_object.get_component<Transform>();
+                auto const screen_coords = Vec2f{ m_camera.world_to_screen_coords(transform->position) };
+                assert(transform.has_value());
+                auto const distance = (mouse_position - screen_coords).magnitude();
+                if (distance <= 20.0f) {
+                    m_focused_planet = game_object;
+                    a_planet_is_focused = true;
+                }
+            }
+        }
+        if (not a_planet_is_focused) {
+            m_focused_planet = tl::nullopt;
+        }
+
         m_elapsed_time += delta_seconds;
     }
 } // namespace view

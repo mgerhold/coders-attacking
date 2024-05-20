@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concepts.hpp"
+#include <cmath>
 #include <stdexcept>
 
 namespace utils {
@@ -46,8 +47,22 @@ namespace utils {
             return *this;
         }
 
-        constexpr Vec2 hadamard_product(Vec2 const other) const {
+        [[nodiscard]] T magnitude() const
+            requires(std::floating_point<T>)
+        {
+            return std::sqrt(x * x + y * y);
+        }
+
+        [[nodiscard]] constexpr Vec2 hadamard_product(Vec2 const other) const {
             return Vec2{ x * other.x, y * other.y };
+        }
+
+        [[nodiscard]] Vec2 operator-() const {
+            return Vec2{ -x, -y };
+        }
+
+        [[nodiscard]] Vec2 operator+() const {
+            return *this;
         }
 
         [[nodiscard]] friend constexpr Vec2 operator+(Vec2 lhs, Vec2 const rhs) {

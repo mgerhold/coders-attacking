@@ -35,7 +35,11 @@ namespace view {
         };
     }
 
-    Vec2f Camera::view_to_world_coords(Vec2f const view_coords) const {
+    [[nodiscard]] Vec2f Camera::view_to_world_coords(Vec2f const view_coords) const {
         return (view_coords - Vec2f{ 0.5f, 0.5f } + m_offset) / m_zoom;
+    }
+
+    [[nodiscard]] Vec2f Camera::screen_to_world_coords(Vec2i const screen_coords) const {
+        return view_to_world_coords(screen_to_view_coords(screen_coords));
     }
 } // namespace view

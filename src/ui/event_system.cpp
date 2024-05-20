@@ -69,6 +69,7 @@ namespace ui {
             if (delta != utils::Vec2i{}) {
                 m_event_queue.emplace_back(MouseMoved{ delta, mouse_position });
             }
+            m_mouse_delta = delta;
         }
         m_mouse_position = mouse_position;
     }
@@ -78,9 +79,11 @@ namespace ui {
         for (auto const button : mouse_buttons) {
             if (IsMouseButtonPressed(static_cast<int>(button))) {
                 m_event_queue.emplace_back(MouseClicked{ m_mouse_position.value(), button });
+                m_pressed_mouse_buttons.insert(button);
             }
             if (IsMouseButtonReleased(static_cast<int>(button))) {
                 m_event_queue.emplace_back(MouseReleased{ m_mouse_position.value(), button });
+                m_pressed_mouse_buttons.erase(button);
             }
         }
     }
@@ -101,5 +104,14 @@ namespace ui {
     [[nodiscard]] utils::Vec2i EventSystem::mouse_position() const {
         return m_mouse_position.value_or(utils::Vec2i{});
     }
+
+    [[nodiscard]] bool EventSystem::is_mouse_button_down(MouseButton const button) const {
+        return m_pressed_mouse_buttons.contains(button);
+    }
+
+    [[nodiscard]] utils::Vec2i EventSystem::mouse_delta() const {
+        return m_mouse_delta;
+    }
+
 
 } // namespace ui

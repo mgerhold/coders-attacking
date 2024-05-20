@@ -68,13 +68,21 @@ namespace view {
             utils::Vec2f world_coords,
             float parallax_distance = 1.0f
         ) const;
+        // clang-format on
+
         [[nodiscard]] utils::Vec2i view_to_screen_coords(utils::Vec2f view_coords) const;
+
+        // clang-format off
         [[nodiscard]] utils::Vec2i world_to_screen_coords(
             utils::Vec2f world_coords,
             float parallax_distance = 1.0f
         ) const;
-        [[nodiscard]] utils::Vec2f screen_to_view_coords(utils::Vec2i screen_coords) const;
-        [[nodiscard]] utils::Vec2f view_to_world_coords(utils::Vec2f view_coords) const;
         // clang-format on
+
+        [[nodiscard]] utils::Vec2f screen_to_view_coords(utils::Vec2i screen_coords) const;
+
+        [[nodiscard]] utils::Vec2f view_to_world_coords(utils::Vec2f view_coords) const;
+
+        [[nodiscard]] utils::Vec2f screen_to_world_coords(utils::Vec2i screen_coords) const;
     };
 } // namespace view

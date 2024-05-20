@@ -15,6 +15,7 @@ private:
     std::shared_ptr<gfx::Font> m_font;
     view::View m_game_view;
     bool m_running{ true };
+    ui::Label* m_focused_planet_label;
 
 public:
     TestScene(SceneManager& scene_manager, std::shared_ptr<gfx::Font> font)
@@ -35,7 +36,11 @@ public:
         if (not m_running) {
             end_scene();
         }
-        m_game_view.update(event_system, delta_seconds);
+        m_game_view.update(m_galaxy, event_system, delta_seconds);
+        m_focused_planet_label->caption(
+                m_game_view.focused_planet().has_value() ? m_game_view.focused_planet()->get_component<Planet>()->name
+                                                         : ""
+        );
         return UpdateResult::KeepUpdating;
     }
 
@@ -73,15 +78,26 @@ private:
                 12,
                 ui::GridLayout::Area{{0,0},{1,12}},
                 ui::GridLayout::Area{{1,11},{15,1}},
-                ui::GridLayout::Area{ { 14, 11 }, { 2, 1 } }
+                ui::GridLayout::Area{ { 14, 11 }, { 2, 1 } },
+                ui::GridLayout::Area{ { 1, 11 }, { 5, 1 } }
             )
         );
         // clang-format on
         auto const frame_color = utils::Color{ 54, 59, 79 };
+        auto focused_planet_label = std::make_unique<ui::Label>(
+                "",
+                m_font,
+                40,
+                utils::Color::White,
+                ui::Alignment::Left,
+                ui::VerticalAlignment::Middle
+        );
+        m_focused_planet_label = focused_planet_label.get();
         m_user_interface.add_widgets(
                 std::make_unique<ui::Panel>(frame_color),
                 std::make_unique<ui::Panel>(frame_color),
-                std::make_unique<ui::Button>("Exit", m_font, [&](auto const&) { m_running = false; })
+                std::make_unique<ui::Button>("Exit", m_font, [&](auto const&) { m_running = false; }),
+                std::move(focused_planet_label)
         );
     }
 

@@ -12,6 +12,8 @@ namespace ui {
         std::unordered_set<Key> m_pressed_keys;
         std::deque<Event> m_event_queue;
         tl::optional<utils::Vec2i> m_mouse_position;
+        std::unordered_set<MouseButton> m_pressed_mouse_buttons;
+        utils::Vec2i m_mouse_delta;
 
     public:
         void update();
@@ -19,6 +21,8 @@ namespace ui {
         void enqueue_event(Event const& event);
         [[nodiscard]] bool is_key_down(Key key) const;
         [[nodiscard]] utils::Vec2i mouse_position() const;
+        [[nodiscard]] bool is_mouse_button_down(MouseButton button) const;
+        [[nodiscard]] utils::Vec2i mouse_delta() const;
 
     private:
         void update_keyboard();
