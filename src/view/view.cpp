@@ -14,9 +14,9 @@ namespace view {
     View::View(IntRect const viewport)
         : m_camera{
               0.9f,
-              4.0f,
+              10.0f,
               viewport,
-              FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.2f),
+              FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.4f),
           } {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
         auto random = c2k::Random{};
@@ -39,6 +39,9 @@ namespace view {
                 auto const transform = game_object.get_component<Transform>();
                 auto const view_coords = m_camera.world_to_view_coords(transform->position);
                 auto const screen_coords = m_camera.view_to_screen_coords(view_coords);
+                if (not m_camera.viewport().contains(screen_coords)) {
+                    continue;
+                }
                 renderer.draw_circle(screen_coords, 5.0f, planet->color);
 
                 static constexpr auto font_size = 20;
