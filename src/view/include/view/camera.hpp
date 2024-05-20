@@ -13,12 +13,24 @@ namespace view {
         float m_zoom = 1.0f;
         float m_min_zoom;
         float m_max_zoom;
+        utils::IntRect m_viewport;
 
     public:
-        Camera(float const min_zoom, float const max_zoom) : m_min_zoom{ min_zoom }, m_max_zoom{ max_zoom } {
+        Camera(float const min_zoom, float const max_zoom, utils::IntRect const viewport)
+            : m_min_zoom{ min_zoom },
+              m_max_zoom{ max_zoom },
+              m_viewport{ viewport } {
             if (max_zoom < min_zoom) {
                 throw std::invalid_argument{ "max_zoom cannot be less then min_zoom" };
             }
+        }
+
+        void set_viewport(utils::IntRect const viewport) {
+            m_viewport = viewport;
+        }
+
+        [[nodiscard]] utils::IntRect viewport() const {
+            return m_viewport;
         }
 
         void move(utils::Vec2f const offset) {
@@ -56,19 +68,13 @@ namespace view {
             utils::Vec2f world_coords,
             float parallax_distance = 1.0f
         ) const;
-        // clang-format off
-        [[nodiscard]] utils::FloatRect world_to_view_coords(utils::FloatRect world_coords) const;
-        [[nodiscard]] utils::Vec2i view_to_screen_coords(utils::Vec2f view_coords, utils::IntRect viewport) const;
-        [[nodiscard]] utils::IntRect view_to_screen_coords(utils::FloatRect view_coords, utils::IntRect viewport) const;
+        [[nodiscard]] utils::Vec2i view_to_screen_coords(utils::Vec2f view_coords) const;
         [[nodiscard]] utils::Vec2i world_to_screen_coords(
             utils::Vec2f world_coords,
-            utils::IntRect viewport,
             float parallax_distance = 1.0f
         ) const;
-        [[nodiscard]] utils::IntRect world_to_screen_coords(
-            utils::FloatRect world_coords,
-            utils::IntRect viewport
-        ) const;
-        // clang-format off
+        [[nodiscard]] utils::Vec2f screen_to_view_coords(utils::Vec2i screen_coords) const;
+        [[nodiscard]] utils::Vec2f view_to_world_coords(utils::Vec2f view_coords) const;
+        // clang-format on
     };
 } // namespace view

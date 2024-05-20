@@ -9,7 +9,7 @@
 #include <view/view.hpp>
 
 namespace view {
-    View::View() : m_camera{ 0.9f, 4.0f } {
+    View::View(utils::IntRect const viewport) : m_camera{ 0.9f, 4.0f, viewport } {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
         auto random = c2k::Random{};
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
@@ -17,25 +17,20 @@ namespace view {
         }
     }
 
-    void View::render_game(
-            Galaxy const& galaxy,
-            utils::IntRect const& viewport,
-            gfx::Renderer& renderer,
-            gfx::Font const& font
-    ) const {
+    void View::render_game(Galaxy const& galaxy, gfx::Renderer& renderer, gfx::Font const& font) const {
         using namespace utils;
 
-        renderer.draw_filled_rectangle(viewport, Color::Black);
+        renderer.draw_filled_rectangle(m_camera.viewport(), Color::Black);
 
         for (auto const& star : m_background_stars) {
-            star.render(renderer, m_camera, m_elapsed_time, viewport);
+            star.render(renderer, m_camera, m_elapsed_time);
         }
 
         for (auto const& game_object : galaxy.game_objects()) {
             if (auto const planet = game_object.get_component<Planet>()) {
                 auto const transform = game_object.get_component<Transform>();
                 auto const view_coords = m_camera.world_to_view_coords(transform->position);
-                auto const screen_coords = m_camera.view_to_screen_coords(view_coords, viewport);
+                auto const screen_coords = m_camera.view_to_screen_coords(view_coords);
                 renderer.draw_circle(screen_coords, 5.0f, planet->color);
 
                 static constexpr auto font_size = 20;
@@ -93,6 +88,11 @@ namespace view {
         if (event_system.is_key_down(ui::Key::KpSubtract)) {
             m_camera.zoom(-(zoom_factor - 1.0f) * delta_seconds + 1.0f);
         }
+        spdlog::info("mouse position: {},{}", event_system.mouse_position().x, event_system.mouse_position().y);
+        auto const view_coords = m_camera.screen_to_view_coords(event_system.mouse_position());
+        spdlog::info("view coords: {},{}", view_coords.x, view_coords.y);
+        auto const world_coords = m_camera.view_to_world_coords(view_coords);
+        spdlog::info("world coords: {},{}", world_coords.x, world_coords.y);
         m_elapsed_time += delta_seconds;
     }
 } // namespace view

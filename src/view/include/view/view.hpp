@@ -17,18 +17,17 @@ namespace view {
         float m_elapsed_time = 0.0f;
 
     public:
-        View();
+        explicit View(utils::IntRect viewport);
 
-        void render_game(
-                Galaxy const& galaxy,
-                utils::IntRect const& viewport,
-                gfx::Renderer& renderer,
-                gfx::Font const& font
-        ) const;
+        void render_game(Galaxy const& galaxy, gfx::Renderer& renderer, gfx::Font const& font) const;
 
         [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event);
 
         void update(ui::EventSystem const& event_system, float delta_seconds);
+
+        void on_window_resized(utils::IntRect const viewport) {
+            m_camera.set_viewport(viewport);
+        }
     };
 
 

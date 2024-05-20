@@ -36,7 +36,7 @@ public:
         m_user_interface.render(renderer);
     }
 
-    void recalculate_layout(utils::IntRect const area) {
+    virtual void on_window_resized(utils::IntRect const area) {
         m_user_interface.recalculate_absolute_area(area);
     }
 

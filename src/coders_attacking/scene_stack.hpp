@@ -21,7 +21,7 @@ public:
     template<std::derived_from<Scene> T, typename... Args>
     void emplace(Args&&... args) {
         m_scenes.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
-        m_scenes.back()->recalculate_layout(m_window_area);
+        m_scenes.back()->on_window_resized(m_window_area);
     }
 
     void update(ui::EventSystem const& event_system, float delta_seconds);

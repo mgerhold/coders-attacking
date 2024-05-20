@@ -39,6 +39,10 @@ namespace utils {
             return Rect{ absolute_top_left, absolute_size };
         }
 
+        [[nodiscard]] constexpr Vec2<T> absolute_to_relative_position(Vec2<T> const absolute_position) const {
+            return (absolute_position - top_left).hadamard_product(Vec2{ T{ 1 } / size.x, T{ 1 } / size.y });
+        }
+
         [[nodiscard]] constexpr Rect scaled_from_center(float const factor) {
             auto const vec = Vec2f{ center() } - Vec2f{ top_left };
             auto const new_top_left = Vec2f{ top_left } + (1.0f - factor) * vec;

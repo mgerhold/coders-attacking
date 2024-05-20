@@ -37,8 +37,7 @@ namespace view {
         void render(
             gfx::Renderer& renderer,
             Camera const& camera,
-            float const elapsed_time,
-            utils::IntRect const viewport
+            float const elapsed_time
         ) const { // clang-format on
             using namespace utils;
             static constexpr auto pi = std::numbers::pi_v<float>;
@@ -52,8 +51,8 @@ namespace view {
                 static_cast<u8>(static_cast<float>(m_color.g) * brightness),
                 static_cast<u8>(static_cast<float>(m_color.b) * brightness),
             };
-            auto const screen_coords = camera.world_to_screen_coords(m_position, viewport, m_distance);
-            if (not viewport.contains(screen_coords)) {
+            auto const screen_coords = camera.world_to_screen_coords(m_position, m_distance);
+            if (not camera.viewport().contains(screen_coords)) {
                 return;
             }
             renderer.draw_circle(screen_coords, m_size, color);

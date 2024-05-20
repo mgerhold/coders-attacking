@@ -18,6 +18,7 @@ namespace ui {
         [[nodiscard]] tl::optional<Event> next_event();
         void enqueue_event(Event const& event);
         [[nodiscard]] bool is_key_down(Key key) const;
+        [[nodiscard]] utils::Vec2i mouse_position() const;
 
     private:
         void update_keyboard();

@@ -49,7 +49,7 @@ void SceneStack::render(gfx::Renderer& renderer) const {
 void SceneStack::recalculate_layout(utils::IntRect const area) {
     m_window_area = area;
     for (auto const& scene : m_scenes) {
-        scene->recalculate_layout(area);
+        scene->on_window_resized(area);
     }
 }
 

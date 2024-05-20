@@ -98,4 +98,8 @@ namespace ui {
         return m_pressed_keys.contains(key);
     }
 
+    [[nodiscard]] utils::Vec2i EventSystem::mouse_position() const {
+        return m_mouse_position.value_or(utils::Vec2i{});
+    }
+
 } // namespace ui

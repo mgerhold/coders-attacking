@@ -20,7 +20,8 @@ public:
     TestScene(SceneManager& scene_manager, std::shared_ptr<gfx::Font> font)
         : Scene{ scene_manager },
           m_galaxy{ create_galaxy() },
-          m_font{ std::move(font) } {
+          m_font{ std::move(font) },
+          m_game_view{ game_viewport() } {
         setup_user_interface();
     }
 
@@ -46,16 +47,24 @@ public:
     }
 
     void render(gfx::Renderer& renderer) const override {
-        auto const size = viewport().size;
-        auto const game_viewport = utils::IntRect{
-            utils::Vec2i{      size.x / 16,                0 },
-            utils::Vec2i{ size.x * 15 / 16, size.y * 11 / 12 },
-        };
-        m_game_view.render_game(m_galaxy, game_viewport, renderer, *m_font);
+        m_game_view.render_game(m_galaxy, renderer, *m_font);
         Scene::render(renderer);
     }
 
+    void on_window_resized(utils::IntRect const area) override {
+        Scene::on_window_resized(area);
+        m_game_view.on_window_resized(game_viewport());
+    }
+
 private:
+    [[nodiscard]] utils::IntRect game_viewport() {
+        auto const size = viewport().size;
+        return utils::IntRect{
+            utils::Vec2i{      size.x / 16,                0 },
+            utils::Vec2i{ size.x * 15 / 16, size.y * 11 / 12 },
+        };
+    }
+
     void setup_user_interface() {
         // clang-format off
         m_user_interface.set_layout(
