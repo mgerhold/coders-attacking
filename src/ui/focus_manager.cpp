@@ -39,7 +39,7 @@ namespace ui {
         std::ranges::sort(focusable_widgets, [](Widget const* const lhs, Widget const* const rhs) {
             return lhs->focus_id().value() < rhs->focus_id().value();
         });
-        auto find_it = std::find(focusable_widgets.begin(), focusable_widgets.end(), &m_focused_widget.value());
+        auto find_it = std::ranges::find(focusable_widgets, &m_focused_widget.value());
         if (find_it == focusable_widgets.end()) {
             auto_focus();
         }
@@ -59,7 +59,7 @@ namespace ui {
         std::ranges::sort(focusable_widgets, [](Widget const* const lhs, Widget const* const rhs) {
             return lhs->focus_id().value() < rhs->focus_id().value();
         });
-        auto find_it = std::find(focusable_widgets.begin(), focusable_widgets.end(), &m_focused_widget.value());
+        auto const find_it = std::ranges::find(focusable_widgets, &m_focused_widget.value());
         if (find_it == focusable_widgets.end()) {
             auto_focus();
         }
