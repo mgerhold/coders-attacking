@@ -7,10 +7,14 @@ struct GameSettings {
     usize num_planets{ 20 };
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameSettings, num_planets);
+
 class Galaxy final {
 private:
     std::vector<GameObject> m_game_objects;
     GameSettings m_game_settings;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Galaxy, m_game_objects, m_game_settings);
 
 public:
     [[nodiscard]] std::vector<GameObject> const& game_objects() const {

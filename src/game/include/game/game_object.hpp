@@ -1,6 +1,6 @@
 #pragma once
 
-#include "component.hpp"
+#include "components.hpp"
 #include <stdexcept>
 #include <tl/optional.hpp>
 #include <vector>
@@ -8,6 +8,8 @@
 class GameObject final {
 private:
     std::vector<Component> m_components;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameObject, m_components);
 
 public:
     void add_component(IsComponent auto&& component) {

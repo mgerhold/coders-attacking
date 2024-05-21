@@ -22,6 +22,12 @@ namespace ui {
                std::shared_ptr<gfx::Font> font,
                std::function<void(Button&)> on_click = {});
 
+        Button(WidgetName&& widget_name,
+               std::string caption,
+               u32 focus_id,
+               std::shared_ptr<gfx::Font> font,
+               std::function<void(Button&)> on_click = {});
+
         [[nodiscard]] HandleEventResult handle_event(Event event) override;
 
         void render(gfx::Renderer& renderer) const override;

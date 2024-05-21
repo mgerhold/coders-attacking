@@ -4,6 +4,7 @@
 #include <lib2k/types.hpp>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
+#include <nlohmann/json.hpp>
 
 namespace utils {
     struct Color {
@@ -138,4 +139,6 @@ namespace utils {
             return Color{ r, g, b };
         }
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Color, r, g, b, a);
 } // namespace utils

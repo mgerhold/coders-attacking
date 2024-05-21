@@ -5,6 +5,7 @@ add_executable(coders_attacking
         scene_manager.hpp
         scene_stack.cpp
         scene_stack.hpp
+        scenes/test_scene.cpp
 )
 
 target_link_libraries(coders_attacking

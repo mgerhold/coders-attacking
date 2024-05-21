@@ -2,6 +2,7 @@
 
 #include "concepts.hpp"
 #include <cmath>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 
 namespace utils {
@@ -96,4 +97,8 @@ namespace utils {
 
     using Vec2f = Vec2<float>;
     using Vec2i = Vec2<int>;
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vec2f, x, y);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vec2i, x, y);
+
 } // namespace utils

@@ -1,9 +1,7 @@
 add_library(game INTERFACE
-        include/game/component.hpp
+        include/game/components.hpp
         include/game/game_object.hpp
-        include/game/planet.hpp
         include/game/galaxy.hpp
-        include/game/transform.hpp
 )
 
 target_link_libraries(game
@@ -18,6 +16,8 @@ target_link_system_libraries(game
         tl::optional
         lib2k
         spdlog::spdlog
+        stduuid
+        nlohmann_json::nlohmann_json
 )
 
 target_include_directories(game

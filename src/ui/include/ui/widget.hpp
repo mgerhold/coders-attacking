@@ -4,12 +4,29 @@
 #include <algorithm>
 #include <gfx/renderer.hpp>
 #include <tl/optional.hpp>
-#include <vector>
 #include <utils/rect.hpp>
 #include <utils/vec2.hpp>
+#include <vector>
 
 namespace ui {
     class FocusManager;
+
+    class WidgetName {
+        friend class Widget;
+
+    private:
+        std::string m_name;
+
+        [[nodiscard]] std::string take() & = delete; // NOLINT (deleted member function should be public)
+
+        [[nodiscard]] std::string take() && {
+            return std::move(m_name);
+        }
+
+    public:
+        WidgetName() = default;
+        explicit WidgetName(std::string name) : m_name{ std::move(name) } { }
+    };
 
     class Widget {
     private:
@@ -30,7 +47,7 @@ namespace ui {
         }
 
     public:
-        explicit Widget(std::string name = "") : m_name{ std::move(name) } { }
+        explicit Widget(WidgetName&& name = WidgetName{}) : m_name{ std::move(name).take() } { }
         Widget(Widget const& other) = default;
         Widget(Widget&& other) noexcept = default;
         Widget& operator=(Widget const& other) = default;
