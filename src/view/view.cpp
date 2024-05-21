@@ -75,10 +75,8 @@ namespace view {
             }
         }
         if (auto const key_pressed = std::get_if<ui::KeyPressed>(&event)) {
-            switch (key_pressed->key) { // NOLINT (not all cases handled)
-                case ui::Key::Space:
-                    m_camera.reset_zoom();
-                    break;
+            if (key_pressed->key == ui::Key::Space) {
+                m_camera.reset_zoom();
             }
         }
         return ui::HandleEventResult::EventNotHandled;
