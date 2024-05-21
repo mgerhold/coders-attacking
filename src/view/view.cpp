@@ -70,7 +70,7 @@ namespace view {
     ) { // clang-format on
         if (auto const mouse_wheel_moved = std::get_if<ui::MouseWheelMoved>(&event)) {
             if (m_camera.viewport().contains(event_system.mouse_position())) {
-                m_camera.zoom(1.0f + mouse_wheel_moved->delta.y * 0.1f);
+                m_camera.zoom_towards(1.0f + mouse_wheel_moved->delta.y * 0.1f, event_system.mouse_position());
                 return ui::HandleEventResult::EventHandled;
             }
         }

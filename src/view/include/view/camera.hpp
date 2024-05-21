@@ -62,10 +62,21 @@ namespace view {
         }
 
         void zoom(float const factor) {
-            auto const new_zoom = std::clamp(m_zoom * factor, m_min_zoom, m_max_zoom);
-            auto const actual_factor = new_zoom / m_zoom;
-            m_zoom = new_zoom;
-            m_offset *= actual_factor;
+            zoom_unclamped(factor);
+            clamp_inside_boundaries();
+        }
+
+        void zoom_towards(float const factor, utils::Vec2i const screen_coords) {
+            auto const offset_from_center =
+                    screen_to_view_coords(screen_coords) - screen_to_view_coords(viewport().center());
+            m_offset += offset_from_center;
+            auto const old_zoom = m_zoom;
+            zoom_unclamped(factor);
+            if (old_zoom == m_zoom) {
+                m_offset -= offset_from_center;
+            } else {
+                m_offset -= offset_from_center / factor;
+            }
             clamp_inside_boundaries();
         }
 
@@ -105,6 +116,13 @@ namespace view {
         [[nodiscard]] utils::Vec2f screen_to_world_coords(utils::Vec2i screen_coords) const;
 
     private:
+        void zoom_unclamped(float const factor) {
+            auto const new_zoom = std::clamp(m_zoom * factor, m_min_zoom, m_max_zoom);
+            auto const actual_factor = new_zoom / m_zoom;
+            m_zoom = new_zoom;
+            m_offset *= actual_factor;
+        }
+
         void clamp_inside_boundaries() {
             auto const visible = visible_rect();
             if (auto const x_offset = m_boundaries.top_left.x - visible.top_left.x; x_offset > 0.0f) {
