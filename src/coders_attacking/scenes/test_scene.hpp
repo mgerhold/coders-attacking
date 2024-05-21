@@ -19,11 +19,14 @@ private:
 
 public:
     TestScene(SceneManager& scene_manager, std::shared_ptr<gfx::Font> font)
-        : Scene{ scene_manager },
+        : Scene{ scene_manager, create_user_interface(font) },
           m_galaxy{ create_galaxy() },
           m_font{ std::move(font) },
           m_game_view{ game_viewport() } {
-        setup_user_interface();
+        auto& exit_button = dynamic_cast<ui::Button&>(m_user_interface->find_widget_by_name("button_exit").value());
+        exit_button.on_click([&](ui::Button&) { m_running = false; });
+        m_focused_planet_label =
+                &dynamic_cast<ui::Label&>(m_user_interface->find_widget_by_name("label_focused_planet").value());
     }
 
     TestScene(TestScene const& other) = delete;
@@ -71,35 +74,37 @@ private:
         };
     }
 
-    void setup_user_interface() {
+    [[nodiscard]] static std::unique_ptr<ui::Widget> create_user_interface(std::shared_ptr<gfx::Font> const& font) {
         // clang-format off
-        m_user_interface.set_layout(
-            std::make_unique<ui::GridLayout>(
+        auto layout = std::make_unique<ui::GridLayout>(
                 16,
                 12,
                 ui::GridLayout::Area{{0,0},{1,12}},
                 ui::GridLayout::Area{{1,11},{15,1}},
                 ui::GridLayout::Area{ { 14, 11 }, { 2, 1 } },
                 ui::GridLayout::Area{ { 1, 11 }, { 5, 1 } }
-            )
-        );
+            );
         // clang-format on
+        auto user_interface = std::make_unique<ui::Panel>(std::move(layout));
         auto const frame_color = utils::Color{ 54, 59, 79 };
         auto focused_planet_label = std::make_unique<ui::Label>(
                 "",
-                m_font,
+                font,
                 40,
                 utils::Color::White,
                 ui::Alignment::Left,
                 ui::VerticalAlignment::Middle
         );
-        m_focused_planet_label = focused_planet_label.get();
-        m_user_interface.add_widgets(
+        focused_planet_label->name("label_focused_planet");
+        auto exit_button = std::make_unique<ui::Button>("Exit", 0, font);
+        exit_button->name("button_exit");
+        user_interface->add_widgets(
                 std::make_unique<ui::Panel>(frame_color),
                 std::make_unique<ui::Panel>(frame_color),
-                std::make_unique<ui::Button>("Exit", m_font, [&](auto const&) { m_running = false; }),
+                std::move(exit_button),
                 std::move(focused_planet_label)
         );
+        return user_interface;
     }
 
     [[nodiscard]] static Galaxy create_galaxy() {

@@ -3,6 +3,7 @@
 #include "scene_manager.hpp"
 #include <gfx/renderer.hpp>
 #include <ui/event.hpp>
+#include <ui/focus_manager.hpp>
 #include <ui/panel.hpp>
 
 class Scene {
@@ -10,10 +11,14 @@ private:
     SceneManager* m_scene_manager;
 
 protected:
-    ui::Panel m_user_interface;
+    std::unique_ptr<ui::Widget> m_user_interface;
+    ui::FocusManager m_focus_manager;
 
 public:
-    explicit Scene(SceneManager& scene_manager) : m_scene_manager{ &scene_manager } { }
+    explicit Scene(SceneManager& scene_manager, std::unique_ptr<ui::Widget> user_interface)
+        : m_scene_manager{ &scene_manager },
+          m_user_interface{ std::move(user_interface) },
+          m_focus_manager{ *m_user_interface } { }
 
     Scene(Scene const& other) = delete;
     Scene(Scene&& other) noexcept = default;
@@ -33,15 +38,15 @@ public:
         ui::Event const& event,
         ui::EventSystem const& event_system
     ) { // clang-format on
-        return m_user_interface.handle_event(event);
+        return m_user_interface->handle_event(event);
     }
 
     virtual void render(gfx::Renderer& renderer) const {
-        m_user_interface.render(renderer);
+        m_user_interface->render(renderer);
     }
 
     virtual void on_window_resized(utils::IntRect const area) {
-        m_user_interface.recalculate_absolute_area(area);
+        m_user_interface->recalculate_absolute_area(area);
     }
 
 protected:

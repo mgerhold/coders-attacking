@@ -16,6 +16,9 @@ add_library(ui STATIC
         include/ui/grid_layout.hpp
         include/ui/bumper.hpp
         include/ui/alignment.hpp
+        include/ui/focus_manager.hpp
+        focus_manager.cpp
+        button.cpp
 )
 
 target_include_directories(ui

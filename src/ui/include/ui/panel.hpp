@@ -1,8 +1,9 @@
 #pragma once
 
+#include "bumper.hpp"
+#include "column_layout.hpp"
+#include "focus_manager.hpp"
 #include "layout.hpp"
-#include "ui/bumper.hpp"
-#include "ui/column_layout.hpp"
 #include "widget.hpp"
 #include <algorithm>
 #include <cassert>
@@ -12,7 +13,7 @@
 #include <utils/color.hpp>
 
 namespace ui {
-    class Panel : public Widget {
+    class Panel final : public Widget {
     private:
         tl::optional<utils::Color> m_color;
         std::unique_ptr<Layout> m_layout;
@@ -68,6 +69,44 @@ namespace ui {
                 auto const sub_area = IntRect{ FloatRect{ this->area() }.relative_to_absolute_rect(area) };
                 widget->recalculate_absolute_area(sub_area);
             }
+        }
+
+        void register_focus_manager(FocusManager& focus_manager) override {
+            Widget::register_focus_manager(focus_manager);
+            for (auto const& widget : m_widgets) {
+                widget->register_focus_manager(focus_manager);
+            }
+        }
+
+        void collect_focusable_widgets(std::vector<Widget*>& focusable_widgets) override {
+            // the panel itself is not focusable, but maybe its children
+            for (auto const& widget : m_widgets) {
+                widget->collect_focusable_widgets(focusable_widgets);
+            }
+        }
+
+        [[nodiscard]] tl::optional<Widget&> find_widget_by_name(std::string_view name) override {
+            if (auto const result = Widget::find_widget_by_name(name)) {
+                return result;
+            }
+            for (auto const& widget : m_widgets) {
+                if (auto result = widget->find_widget_by_name(name)) {
+                    return result.value();
+                }
+            }
+            return tl::nullopt;
+        }
+
+        [[nodiscard]] tl::optional<Widget const&> find_widget_by_name(std::string_view const name) const override {
+            if (auto const result = Widget::find_widget_by_name(name)) {
+                return result;
+            }
+            for (auto const& widget : m_widgets) {
+                if (auto const result = widget->find_widget_by_name(name)) {
+                    return result.value();
+                }
+            }
+            return tl::nullopt;
         }
     };
 } // namespace ui
