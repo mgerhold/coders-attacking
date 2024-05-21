@@ -13,6 +13,7 @@ namespace ui {
         std::function<void(Button&)> m_on_click;
         bool m_hover_is_active{ false };
         bool m_click_started{ false };
+        bool m_keypress_started{ false };
         u32 m_focus_id;
 
     public:

@@ -81,6 +81,9 @@ private:
                 12,
                 ui::GridLayout::Area{{0,0},{1,12}},
                 ui::GridLayout::Area{{1,11},{15,1}},
+                ui::GridLayout::Area{{0,0},{1,1}},
+                ui::GridLayout::Area{{0,1},{1,1}},
+                ui::GridLayout::Area{{0,2},{1,1}},
                 ui::GridLayout::Area{ { 14, 11 }, { 2, 1 } },
                 ui::GridLayout::Area{ { 1, 11 }, { 5, 1 } }
             );
@@ -101,6 +104,9 @@ private:
         user_interface->add_widgets(
                 std::make_unique<ui::Panel>(frame_color),
                 std::make_unique<ui::Panel>(frame_color),
+                std::make_unique<ui::Button>("A", 1, font),
+                std::make_unique<ui::Button>("B", 2, font),
+                std::make_unique<ui::Button>("C", 3, font),
                 std::move(exit_button),
                 std::move(focused_planet_label)
         );

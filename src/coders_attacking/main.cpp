@@ -7,7 +7,7 @@ int main() {
     using namespace utils;
 
     auto window = gfx::Window{
-        { 800, 600 },
+        { 1280, 720 },
         "coders attacking"
     };
     window.set_resizable(true);

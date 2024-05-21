@@ -52,5 +52,11 @@ namespace ui {
                 focus(**min_id);
             }
         }
+
+        [[nodiscard]] HandleEventResult handle_event(Event event);
+
+    private:
+        void next();
+        void previous();
     };
 } // namespace ui
