@@ -1,8 +1,7 @@
 #pragma once
 
-#include "ui/widget.hpp"
-
-
+#include "event_system.hpp"
+#include "widget.hpp"
 #include <lib2k/types.hpp>
 #include <tl/optional.hpp>
 
@@ -53,7 +52,7 @@ namespace ui {
             }
         }
 
-        [[nodiscard]] HandleEventResult handle_event(Event event);
+        [[nodiscard]] HandleEventResult handle_event(Event event, EventSystem const& event_system);
 
     private:
         void next();

@@ -38,7 +38,7 @@ public:
         ui::Event const& event,
         ui::EventSystem const& event_system
     ) { // clang-format on
-        auto const focus_manager_result = m_focus_manager.handle_event(event);
+        auto const focus_manager_result = m_focus_manager.handle_event(event, event_system);
         auto const user_interface_result = m_user_interface->handle_event(event);
         return (focus_manager_result == ui::HandleEventResult::EventHandled
                 or user_interface_result == ui::HandleEventResult::EventHandled)

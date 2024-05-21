@@ -14,10 +14,14 @@ namespace ui {
         return false;
     }
 
-    [[nodiscard]] HandleEventResult FocusManager::handle_event(Event const event) {
+    [[nodiscard]] HandleEventResult FocusManager::handle_event(Event const event, EventSystem const& event_system) {
         if (auto const key_pressed = std::get_if<KeyPressed>(&event)) {
             if (key_pressed->key == Key::Tab) {
-                next();
+                if (event_system.is_key_down(Key::LeftShift) or event_system.is_key_down(Key::RightShift)) {
+                    previous();
+                } else {
+                    next();
+                }
                 return HandleEventResult::EventHandled;
             }
         }
@@ -44,5 +48,22 @@ namespace ui {
         focus(**successor);
     }
 
-    void FocusManager::previous() { }
+    void FocusManager::previous() {
+        if (not m_focused_widget.has_value()) {
+            auto_focus();
+            return;
+        }
+
+        auto focusable_widgets = std::vector<Widget*>{};
+        m_root->collect_focusable_widgets(focusable_widgets);
+        std::ranges::sort(focusable_widgets, [](Widget const* const lhs, Widget const* const rhs) {
+            return lhs->focus_id().value() < rhs->focus_id().value();
+        });
+        auto find_it = std::find(focusable_widgets.begin(), focusable_widgets.end(), &m_focused_widget.value());
+        if (find_it == focusable_widgets.end()) {
+            auto_focus();
+        }
+        auto const predecessor = (find_it == focusable_widgets.begin() ? focusable_widgets.end() - 1 : find_it - 1);
+        focus(**predecessor);
+    }
 } // namespace ui
