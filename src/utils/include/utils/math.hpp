@@ -11,4 +11,13 @@ namespace utils {
         }
         return T{ 1 } + ((lhs - T{ 1 }) / rhs);
     }
+
+    template<std::floating_point T>
+    [[nodiscard]] constexpr T lerp(T const start, T const end, T const alpha) {
+        return start + alpha * (end - start);
+    }
+
+    [[nodiscard]] constexpr Vec2f lerp(Vec2f const start, Vec2f const end, float const alpha) {
+        return start + alpha * (end - start);
+    }
 } // namespace utils
