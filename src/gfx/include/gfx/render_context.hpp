@@ -11,7 +11,7 @@ namespace gfx {
 
     class RenderContext final {
     private:
-        friend class Application;
+        friend class ::Application;
 
         struct Deleter final {
             void operator()(std::monostate) const;
