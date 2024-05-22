@@ -1,26 +1,25 @@
-add_library(game INTERFACE
+add_library(game STATIC
         include/game/components.hpp
         include/game/game_object.hpp
         include/game/galaxy.hpp
+        include/game/uuid.hpp
+        uuid.cpp
 )
 
 target_link_libraries(game
-        INTERFACE
+        PUBLIC
         utils
 )
 
 target_link_system_libraries(game
-        INTERFACE
-        Microsoft.GSL::GSL
-        tl::expected
-        tl::optional
+        PUBLIC
         lib2k
-        spdlog::spdlog
-        stduuid
         nlohmann_json::nlohmann_json
+        PRIVATE
+        stduuid
 )
 
 target_include_directories(game
-        INTERFACE
+        PUBLIC
         include
 )

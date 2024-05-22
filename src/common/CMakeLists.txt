@@ -8,12 +8,8 @@ target_include_directories(common
         PUBLIC
         include
 )
+
 target_link_libraries(common
         PUBLIC
         gfx
-)
-
-target_link_system_libraries(common
-        PRIVATE
-        raylib
 )

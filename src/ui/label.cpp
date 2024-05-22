@@ -1,4 +1,5 @@
 #include <cassert>
+#include <functional>
 #include <lib2k/string_utils.hpp>
 #include <ranges>
 #include <tl/optional.hpp>
