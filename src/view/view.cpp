@@ -1,7 +1,7 @@
+#include "common/resource_manager.hpp"
 #include "view/background_star.hpp"
-
-
 #include <cmath>
+#include <gfx/window.hpp>
 #include <lib2k/random.hpp>
 #include <numbers>
 #include <ranges>
@@ -11,13 +11,13 @@
 namespace view {
     using namespace utils;
 
-    View::View(IntRect const viewport)
+    View::View(ServiceProvider& service_provider)
         : m_camera{
               0.9f,
               10.0f,
-              viewport,
+              service_provider.window().area(),
               FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.4f),
-          } {
+          }, m_service_provider{ &service_provider } {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
         auto random = c2k::Random{};
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
@@ -25,8 +25,10 @@ namespace view {
         }
     }
 
-    void View::render_game(Galaxy const& galaxy, gfx::Renderer& renderer, gfx::Font const& font) const {
+    void View::render_game(Galaxy const& galaxy, gfx::Renderer& renderer) const {
         using namespace utils;
+
+        auto const& font = m_service_provider->resource_manager().font(FontType::Roboto);
 
         renderer.draw_filled_rectangle(m_camera.viewport(), Color::Black);
 

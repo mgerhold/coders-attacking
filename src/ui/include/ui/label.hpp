@@ -11,7 +11,7 @@ namespace ui {
     private:
         std::string m_caption;
         utils::Color m_color;
-        std::shared_ptr<gfx::Font> m_font;
+        gfx::Font const* m_font;
         int m_max_font_size;
         float m_font_size;
         std::vector<std::string> m_wrapped_text;
@@ -22,19 +22,19 @@ namespace ui {
 
     public:
         Label(std::string caption,
-              std::shared_ptr<gfx::Font> font,
+              gfx::Font const& font,
               int const max_size,
               utils::Color const color,
               Alignment const alignment = Alignment::Left,
               VerticalAlignment const vertical_alignment = VerticalAlignment::Top,
               float const line_height = 1.2f)
             : Label{
-                  {}, std::move(caption), std::move(font), max_size, color, alignment, vertical_alignment, line_height,
+                  {}, std::move(caption), font, max_size, color, alignment, vertical_alignment, line_height,
               } { }
 
         Label(WidgetName&& widget_name,
               std::string caption,
-              std::shared_ptr<gfx::Font> font,
+              gfx::Font const& font,
               int const max_size,
               utils::Color const color,
               Alignment const alignment = Alignment::Left,
@@ -43,7 +43,7 @@ namespace ui {
             : Widget{ std::move(widget_name) },
               m_caption{ std::move(caption) },
               m_color{ color },
-              m_font{ std::move(font) },
+              m_font{ &font },
               m_max_font_size{ max_size },
               m_font_size{ 1.0f },
               m_alignment{ alignment },

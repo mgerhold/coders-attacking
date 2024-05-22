@@ -8,6 +8,7 @@
 #include <ui/event_system.hpp>
 #include <utils/rect.hpp>
 #include <vector>
+#include <common/service_provider.hpp>
 
 namespace view {
     class View final {
@@ -16,11 +17,12 @@ namespace view {
         std::vector<BackgroundStar> m_background_stars;
         float m_elapsed_time = 0.0f;
         tl::optional<GameObject const&> m_focused_planet;
+        ServiceProvider* m_service_provider;
 
     public:
-        explicit View(utils::IntRect viewport);
+        explicit View(ServiceProvider& service_provider);
 
-        void render_game(Galaxy const& galaxy, gfx::Renderer& renderer, gfx::Font const& font) const;
+        void render_game(Galaxy const& galaxy, gfx::Renderer& renderer) const;
 
         [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event, ui::EventSystem const& event_system);
 

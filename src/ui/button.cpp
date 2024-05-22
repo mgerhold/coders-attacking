@@ -7,21 +7,20 @@ namespace ui {
     Button::Button(
             std::string caption,
             u32 const focus_id,
-            std::shared_ptr<gfx::Font> font,
+            gfx::Font const& font,
             std::function<void(Button&)> on_click
     )
-        : Button{ {}, std::move(caption), focus_id, std::move(font), std::move(on_click) } { }
+        : Button{ {}, std::move(caption), focus_id, font, std::move(on_click) } { }
 
     Button::Button(
             WidgetName&& widget_name,
             std::string caption,
             u32 const focus_id,
-            std::shared_ptr<gfx::Font> font,
+            gfx::Font const& font,
             std::function<void(Button&)> on_click
     )
         : Widget{ std::move(widget_name) },
-          m_caption{ std::move(caption),  std::move(font),   40,
-                     utils::Color::Black, Alignment::Center, VerticalAlignment::Middle },
+          m_caption{ std::move(caption), font, 40, utils::Color::Black, Alignment::Center, VerticalAlignment::Middle },
           m_on_click{ std::move(on_click) },
           m_focus_id{ focus_id } { }
 

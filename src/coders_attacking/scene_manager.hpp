@@ -14,7 +14,6 @@ public:
     SceneManager& operator=(SceneManager&& other) noexcept = default;
     virtual ~SceneManager() = default;
 
-    virtual void delete_scene() = 0;
-    virtual void enqueue_scene(std::unique_ptr<Scene> scene) = 0;
-    [[nodiscard]] virtual utils::IntRect viewport() const = 0;
+    virtual void end_scene() = 0;
+    virtual void enqueue(std::unique_ptr<Scene> scene) = 0;
 };

@@ -10,13 +10,6 @@
 }
 
 namespace gfx {
-    void Renderer::Deleter::operator()(std::monostate) const {
-        EndDrawing();
-    }
-
-    Renderer::Renderer() : m_handle{ std::monostate{} } {
-        BeginDrawing();
-    }
 
     void Renderer::clear(utils::Color const color) {
         ClearBackground(to_raylib(color));

@@ -5,6 +5,8 @@ add_library(gfx STATIC
         renderer.cpp
         include/gfx/font.hpp
         font.cpp
+        include/gfx/render_context.hpp
+        render_context.cpp
 )
 
 target_include_directories(gfx

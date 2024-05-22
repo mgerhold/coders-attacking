@@ -6,6 +6,10 @@ add_executable(coders_attacking
         scene_stack.cpp
         scene_stack.hpp
         scenes/test_scene.cpp
+        application.hpp
+        application.cpp
+        scene_manager_proxy.cpp
+        scene_manager_proxy.hpp
 )
 
 target_link_libraries(coders_attacking
@@ -14,6 +18,7 @@ target_link_libraries(coders_attacking
         gfx
         ui
         utils
+        common
 )
 
 target_link_system_libraries(coders_attacking

@@ -4,30 +4,37 @@
 #include <ranges>
 
 void SceneStack::update(ui::EventSystem const& event_system, float const delta_seconds) {
+    if (m_service_provider->window().was_resized()) {
+        recalculate_layout();
+    }
+
+    if (m_scene_manager_proxy.m_should_delete_current_scene or not m_scene_manager_proxy.m_scenes_to_push.empty()) {
+        throw std::runtime_error{ "manipulating the scene stack is only allowed during update" };
+    }
+
     auto scenes_to_delete = std::vector<usize>{};
-    auto scenes_to_enqueue = std::vector<std::unique_ptr<Scene>>{};
-    m_scene_manager_calls_allowed = true;
     for (auto i = usize{ 0 }; i < m_scenes.size(); ++i) {
         auto const index = m_scenes.size() - i - 1;
-        m_should_delete_current_scene = false;
         auto const result = m_scenes.at(index)->update(event_system, delta_seconds);
-        if (m_should_delete_current_scene) {
+        if (m_scene_manager_proxy.m_should_delete_current_scene) {
             scenes_to_delete.push_back(index);
-        }
-        if (m_scene_to_enqueue != nullptr) {
-            scenes_to_enqueue.push_back(std::move(m_scene_to_enqueue));
+            m_scene_manager_proxy.m_should_delete_current_scene = false;
         }
         if (result == Scene::UpdateResult::StopUpdating) {
             break;
         }
     }
-    m_scene_manager_calls_allowed = false;
     for (auto const i : scenes_to_delete) {
         auto it = m_scenes.begin();
         std::advance(it, i);
         m_scenes.erase(it);
     }
-    std::move(scenes_to_enqueue.begin(), scenes_to_enqueue.end(), std::back_inserter(m_scenes));
+    std::move(
+            m_scene_manager_proxy.m_scenes_to_push.begin(),
+            m_scene_manager_proxy.m_scenes_to_push.end(),
+            std::back_inserter(m_scenes)
+    );
+    assert(m_scene_manager_proxy.m_scenes_to_push.empty());
 }
 
 void SceneStack::handle_event(ui::Event const& event, ui::EventSystem const& event_system) {
@@ -46,23 +53,8 @@ void SceneStack::render(gfx::Renderer& renderer) const {
     }
 }
 
-void SceneStack::recalculate_layout(utils::IntRect const area) {
-    m_window_area = area;
+void SceneStack::recalculate_layout() {
     for (auto const& scene : m_scenes) {
-        scene->on_window_resized(area);
+        scene->on_window_resized(m_service_provider->window().area());
     }
-}
-
-void SceneStack::delete_scene() {
-    if (not m_scene_manager_calls_allowed) {
-        throw std::runtime_error{ "scene manager calls are only allowed within update()" };
-    }
-    m_should_delete_current_scene = true;
-}
-
-void SceneStack::enqueue_scene(std::unique_ptr<Scene> scene) {
-    if (not m_scene_manager_calls_allowed) {
-        throw std::runtime_error{ "scene manager calls are only allowed within update()" };
-    }
-    m_scene_to_enqueue = std::move(scene);
 }

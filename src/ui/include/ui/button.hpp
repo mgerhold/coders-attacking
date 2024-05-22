@@ -17,15 +17,12 @@ namespace ui {
         u32 m_focus_id;
 
     public:
-        Button(std::string caption,
-               u32 focus_id,
-               std::shared_ptr<gfx::Font> font,
-               std::function<void(Button&)> on_click = {});
+        Button(std::string caption, u32 focus_id, gfx::Font const& font, std::function<void(Button&)> on_click = {});
 
         Button(WidgetName&& widget_name,
                std::string caption,
                u32 focus_id,
-               std::shared_ptr<gfx::Font> font,
+               gfx::Font const& font,
                std::function<void(Button&)> on_click = {});
 
         [[nodiscard]] HandleEventResult handle_event(Event event) override;

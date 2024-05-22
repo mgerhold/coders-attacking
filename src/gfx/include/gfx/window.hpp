@@ -26,11 +26,7 @@ namespace gfx {
 
         [[nodiscard]] float delta_seconds() const;
 
-        [[nodiscard]] Renderer renderer() {
-            return Renderer{};
-        }
-
-        [[nodiscard]] tl::optional<Font> load_font(char const* filename, int font_size);
+        [[nodiscard]] tl::optional<Font> load_font(char const* filename, int font_size) const;
         [[nodiscard]] bool was_resized() const;
         void poll_events();
 

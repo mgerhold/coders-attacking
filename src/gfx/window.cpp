@@ -40,7 +40,7 @@ namespace gfx {
         return GetFrameTime();
     }
 
-    [[nodiscard]] tl::optional<Font> Window::load_font(char const* filename, int font_size) {
+    [[nodiscard]] tl::optional<Font> Window::load_font(char const* filename, int font_size) const {
         auto const font = LoadFontEx(filename, font_size, nullptr, 0);
         if (not IsFontReady(font) or font.texture.id == GetFontDefault().texture.id) {
             return tl::nullopt;

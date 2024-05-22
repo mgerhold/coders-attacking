@@ -9,7 +9,6 @@
 class TestScene final : public Scene {
 private:
     Galaxy m_galaxy;
-    std::shared_ptr<gfx::Font> m_font;
     view::View m_game_view;
     bool m_running{ true };
     ui::Label* m_focused_planet_label;
@@ -17,7 +16,9 @@ private:
     static constexpr auto savegame_filename = "my_savegame.json";
 
 public:
-    TestScene(SceneManager& scene_manager, std::shared_ptr<gfx::Font> font);
+    explicit TestScene(ServiceProvider& service_provider);
+
+    // prohibit (copy and) move to avoid problems when passing pointers to members around
     TestScene(TestScene const& other) = delete;
     TestScene(TestScene&& other) noexcept = delete;
     TestScene& operator=(TestScene const& other) = delete;
@@ -45,6 +46,6 @@ private:
     void save() const;
     void load();
     [[nodiscard]] utils::IntRect game_viewport() const;
-    [[nodiscard]] static std::unique_ptr<ui::Widget> create_user_interface(std::shared_ptr<gfx::Font> const& font);
+    [[nodiscard]] static std::unique_ptr<ui::Widget> create_user_interface(ServiceProvider& service_provider);
     [[nodiscard]] static Galaxy create_galaxy();
 };

@@ -2,31 +2,37 @@
 
 #include "font.hpp"
 #include "utils/rect.hpp"
-#include <lib2k/unique_value.hpp>
 #include <utils/color.hpp>
 #include <utils/vec2.hpp>
-#include <variant>
 
 namespace gfx {
-    class Window;
+
+    class RenderContext;
 
     class Renderer final {
-        friend class Window;
+        friend class RenderContext;
 
-    private:
-        struct Deleter {
-            void operator()(std::monostate) const;
-        };
-
-        c2k::UniqueValue<std::monostate, Deleter> m_handle;
-
-        Renderer();
+        [[nodiscard]] Renderer() = default;
 
     public:
+        // should only be used as reference
+        Renderer(Renderer const& other) = delete;
+        Renderer(Renderer&& other) noexcept = delete;
+        Renderer& operator=(Renderer const& other) = delete;
+        Renderer& operator=(Renderer&& other) noexcept = delete;
+        ~Renderer() = default;
+
         void clear(utils::Color color);
         void draw_text(Font const& font, char const* text, utils::Vec2i position, float size, utils::Color color);
         void draw_filled_rectangle(utils::IntRect const& area, utils::Color color);
-        void draw_filled_rounded_rectangle(utils::IntRect const& area, float roundness, int segments, utils::Color color);
+        // clang-format off
+        void draw_filled_rounded_rectangle(
+            utils::IntRect const& area,
+            float roundness,
+            int segments,
+            utils::Color color
+        );
+        // clang-format on
         void draw_rounded_rectangle_outline(
                 utils::IntRect const& area,
                 float roundness,

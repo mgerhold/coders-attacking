@@ -18,4 +18,5 @@ target_link_libraries(view
         gfx
         game
         utils
+        common
 )

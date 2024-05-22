@@ -3,31 +3,30 @@
 #include "gfx/window.hpp"
 #include "scene.hpp"
 #include "scene_manager.hpp"
-
+#include "scene_manager_proxy.hpp"
+#include <common/service_provider.hpp>
 #include <memory>
 #include <vector>
 
-class SceneStack final : public SceneManager {
+class SceneStack final {
 private:
+    ServiceProvider* m_service_provider;
     std::vector<std::unique_ptr<Scene>> m_scenes;
-    bool m_should_delete_current_scene{ false };
-    std::unique_ptr<Scene> m_scene_to_enqueue{ nullptr };
-    bool m_scene_manager_calls_allowed{ false };
-    utils::IntRect m_window_area;
+    SceneManagerProxy m_scene_manager_proxy;
 
 public:
-    explicit SceneStack(gfx::Window const& window) : m_window_area{ window.area() } { }
+    explicit SceneStack(ServiceProvider& service_provider) : m_service_provider{ &service_provider } { }
 
     template<std::derived_from<Scene> T, typename... Args>
     void emplace(Args&&... args) {
-        m_scenes.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
-        m_scenes.back()->on_window_resized(m_window_area);
+        m_scenes.emplace_back(std::make_unique<T>(*m_service_provider, std::forward<Args>(args)...));
+        m_scenes.back()->on_window_resized(m_service_provider->window().area());
     }
 
     void update(ui::EventSystem const& event_system, float delta_seconds);
     void handle_event(ui::Event const& event, ui::EventSystem const& event_system);
     void render(gfx::Renderer& renderer) const;
-    void recalculate_layout(utils::IntRect area);
+    void recalculate_layout();
 
     [[nodiscard]] usize size() const {
         return m_scenes.size();
@@ -37,10 +36,7 @@ public:
         return size() == 0;
     }
 
-    void delete_scene() override;
-    void enqueue_scene(std::unique_ptr<Scene> scene) override;
-
-    [[nodiscard]] utils::IntRect viewport() const override {
-        return m_window_area;
+    [[nodiscard]] SceneManager& scene_manager() {
+        return m_scene_manager_proxy;
     }
 };

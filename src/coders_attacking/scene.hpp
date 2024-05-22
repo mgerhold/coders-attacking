@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene_manager.hpp"
+#include <common/service_provider.hpp>
 #include <gfx/renderer.hpp>
 #include <ui/event.hpp>
 #include <ui/focus_manager.hpp>
@@ -8,15 +9,15 @@
 
 class Scene {
 private:
-    SceneManager* m_scene_manager;
+    ServiceProvider* m_service_provider;
 
 protected:
     std::unique_ptr<ui::Widget> m_user_interface;
     ui::FocusManager m_focus_manager;
 
 public:
-    explicit Scene(SceneManager& scene_manager, std::unique_ptr<ui::Widget> user_interface)
-        : m_scene_manager{ &scene_manager },
+    explicit Scene(ServiceProvider& service_provider, std::unique_ptr<ui::Widget> user_interface)
+        : m_service_provider{ &service_provider },
           m_user_interface{ std::move(user_interface) },
           m_focus_manager{ *m_user_interface } { }
 
@@ -55,16 +56,21 @@ public:
     }
 
 protected:
-    void end_scene() const { // NOLINT (not marked const)
-        m_scene_manager->delete_scene();
+    [[nodiscard]] ServiceProvider& service_provider() {
+        return *m_service_provider;
+    }
+
+    [[nodiscard]] ServiceProvider const& service_provider() const {
+        return *m_service_provider;
+    }
+
+    void end_scene() {
+        service_provider().scene_manager().end_scene();
     }
 
     template<std::derived_from<Scene> T, typename... Args>
-    void push_scene(Args&&... args) const {
-        m_scene_manager->enqueue_scene(std::make_unique<T>(*m_scene_manager, std::forward<Args>(args)...));
-    }
-
-    [[nodiscard]] utils::IntRect viewport() const {
-        return m_scene_manager->viewport();
+    void push_scene(Args&&... args) {
+        service_provider().scene_manager().enqueue(std::make_unique<T>(service_provider(), std::forward<Args>(args)...)
+        );
     }
 };

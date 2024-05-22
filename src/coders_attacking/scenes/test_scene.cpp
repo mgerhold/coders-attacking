@@ -1,4 +1,8 @@
 #include "test_scene.hpp"
+
+#include "common/resource_manager.hpp"
+#include "gfx/window.hpp"
+
 #include <algorithm>
 #include <array>
 #include <lib2k/file_utils.hpp>
@@ -8,11 +12,10 @@ using namespace ui;
 using namespace utils;
 using namespace c2k;
 
-TestScene::TestScene(SceneManager& scene_manager, std::shared_ptr<gfx::Font> font)
-    : Scene{ scene_manager, create_user_interface(font) },
+TestScene::TestScene(ServiceProvider& service_provider)
+    : Scene{ service_provider, create_user_interface(service_provider) },
       m_galaxy{ create_galaxy() },
-      m_font{ std::move(font) },
-      m_game_view{ game_viewport() } {
+      m_game_view{ service_provider } {
     find_widget<Button>("button_save").on_click([&](Button&) { save(); });
     find_widget<Button>("button_load").on_click([&](Button&) { load(); });
     find_widget<Button>("button_exit").on_click([&](Button&) { m_running = false; });
@@ -38,7 +41,7 @@ HandleEventResult TestScene::handle_event(Event const& event, EventSystem const&
 }
 
 void TestScene::render(gfx::Renderer& renderer) const {
-    m_game_view.render_game(m_galaxy, renderer, *m_font);
+    m_game_view.render_game(m_galaxy, renderer);
     Scene::render(renderer);
 }
 
@@ -60,14 +63,14 @@ void TestScene::load() {
 }
 
 [[nodiscard]] IntRect TestScene::game_viewport() const {
-    auto const size = viewport().size;
+    auto const size = service_provider().window().area().size;
     return IntRect{
         Vec2i{      size.x / 16,                0 },
         Vec2i{ size.x * 15 / 16, size.y * 11 / 12 },
     };
 }
 
-[[nodiscard]] std::unique_ptr<Widget> TestScene::create_user_interface(std::shared_ptr<gfx::Font> const& font) {
+[[nodiscard]] std::unique_ptr<Widget> TestScene::create_user_interface(ServiceProvider& service_provider) {
     // clang-format off
         auto layout = std::make_unique<GridLayout>(
                 16,
@@ -80,6 +83,7 @@ void TestScene::load() {
                 GridLayout::Area{ { 1, 11 }, { 5, 1 } }
             );
     // clang-format on
+    auto const& font = service_provider.resource_manager().font(FontType::Roboto);
     auto user_interface = std::make_unique<Panel>(std::move(layout));
     static constexpr auto frame_color = Color{ 54, 59, 79 };
     user_interface->add_widgets(
