@@ -1,21 +1,31 @@
 #pragma once
 
-#include "utils/rect.hpp"
-
-
 #include <algorithm>
+#include <common/service_provider.hpp>
+#include <gfx/window.hpp>
 #include <spdlog/spdlog.h>
+#include <tl/optional.hpp>
+#include <utils/math.hpp>
+#include <utils/rect.hpp>
 #include <utils/vec2.hpp>
 
 namespace view {
     class Camera final {
     private:
+        struct ZoomCommand final {
+            float amount;
+            utils::Vec2i direction;
+
+            ZoomCommand(float const amount, utils::Vec2i const direction) : amount{ amount }, direction{ direction } { }
+        };
+
         utils::Vec2f m_offset;
         float m_zoom = 1.0f;
         float m_min_zoom;
         float m_max_zoom;
         utils::IntRect m_viewport;
         utils::FloatRect m_boundaries;
+        tl::optional<ZoomCommand> m_zoom_command;
 
     public:
         Camera(float const min_zoom,
@@ -28,6 +38,25 @@ namespace view {
               m_boundaries{ boundaries } {
             if (max_zoom < min_zoom) {
                 throw std::invalid_argument{ "max_zoom cannot be less then min_zoom" };
+            }
+        }
+
+        void update(ServiceProvider const& service_provider) {
+            static constexpr auto zoom_per_second = 10.0f;
+            if (m_zoom_command.has_value()) {
+                auto const zoom_per_frame = zoom_per_second * service_provider.window().delta_seconds();
+                apply_zoom_towards(1.0f + zoom_per_frame * m_zoom_command->amount, m_zoom_command->direction);
+                if (m_zoom_command->amount > 0.0f) {
+                    m_zoom_command->amount -= zoom_per_frame;
+                    if (m_zoom_command->amount <= 0.0f) {
+                        m_zoom_command = tl::nullopt;
+                    }
+                } else if (m_zoom_command->amount < 0.0f) {
+                    m_zoom_command->amount += zoom_per_frame;
+                    if (m_zoom_command->amount >= 0.0f) {
+                        m_zoom_command = tl::nullopt;
+                    }
+                }
             }
         }
 
@@ -67,17 +96,7 @@ namespace view {
         }
 
         void zoom_towards(float const factor, utils::Vec2i const screen_coords) {
-            auto const offset_from_center =
-                    screen_to_view_coords(screen_coords) - screen_to_view_coords(viewport().center());
-            m_offset += offset_from_center;
-            auto const old_zoom = m_zoom;
-            zoom_unclamped(factor);
-            if (old_zoom == m_zoom) {
-                m_offset -= offset_from_center;
-            } else {
-                m_offset -= offset_from_center / factor;
-            }
-            clamp_inside_boundaries();
+            m_zoom_command = ZoomCommand{ (factor - 1.0f) * 5.0f, screen_coords };
         }
 
         void set_zoom(float const value) {
@@ -116,6 +135,20 @@ namespace view {
         [[nodiscard]] utils::Vec2f screen_to_world_coords(utils::Vec2i screen_coords) const;
 
     private:
+        void apply_zoom_towards(float const factor, utils::Vec2i const screen_coords) {
+            auto const offset_from_center =
+                    screen_to_view_coords(screen_coords) - screen_to_view_coords(viewport().center());
+            m_offset += offset_from_center;
+            auto const old_zoom = m_zoom;
+            zoom_unclamped(factor);
+            if (old_zoom == m_zoom) {
+                m_offset -= offset_from_center;
+            } else {
+                m_offset -= offset_from_center / factor;
+            }
+            clamp_inside_boundaries();
+        }
+
         void zoom_unclamped(float const factor) {
             auto const new_zoom = std::clamp(m_zoom * factor, m_min_zoom, m_max_zoom);
             auto const actual_factor = new_zoom / m_zoom;

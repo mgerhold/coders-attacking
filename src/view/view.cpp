@@ -87,6 +87,7 @@ namespace view {
     void View::update(Galaxy const& galaxy, ui::EventSystem const& event_system, float const delta_seconds) {
         static constexpr auto scroll_speed = 0.1f;
         static constexpr auto zoom_factor = 1.2f;
+        m_camera.update(*m_service_provider);
         if (event_system.is_key_down(ui::Key::Left)) {
             m_camera.move({ -scroll_speed * delta_seconds, 0.0f });
         }
