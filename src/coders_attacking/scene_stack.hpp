@@ -20,11 +20,11 @@ public:
     template<std::derived_from<Scene> T, typename... Args>
     void emplace(Args&&... args) {
         m_scenes.emplace_back(std::make_unique<T>(*m_service_provider, std::forward<Args>(args)...));
-        m_scenes.back()->on_window_resized(m_service_provider->window().area());
+        m_scenes.back()->on_window_resized();
     }
 
-    void update(ui::EventSystem const& event_system, float delta_seconds);
-    void handle_event(ui::Event const& event, ui::EventSystem const& event_system);
+    void update();
+    void handle_event(ui::Event const& event);
     void render(gfx::Renderer& renderer) const;
     void recalculate_layout();
 

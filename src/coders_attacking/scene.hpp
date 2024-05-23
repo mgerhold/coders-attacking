@@ -3,6 +3,7 @@
 #include "scene_manager.hpp"
 #include <common/service_provider.hpp>
 #include <gfx/renderer.hpp>
+#include <gfx/window.hpp>
 #include <ui/event.hpp>
 #include <ui/focus_manager.hpp>
 #include <ui/panel.hpp>
@@ -19,7 +20,7 @@ public:
     explicit Scene(ServiceProvider& service_provider, std::unique_ptr<ui::Widget> user_interface)
         : m_service_provider{ &service_provider },
           m_user_interface{ std::move(user_interface) },
-          m_focus_manager{ *m_user_interface } { }
+          m_focus_manager{ service_provider, *m_user_interface } { }
 
     Scene(Scene const& other) = delete;
     Scene(Scene&& other) noexcept = default;
@@ -32,14 +33,10 @@ public:
         StopUpdating,
     };
 
-    [[nodiscard]] virtual UpdateResult update(ui::EventSystem const& event_system, float delta_seconds) = 0;
+    [[nodiscard]] virtual UpdateResult update() = 0;
 
-    // clang-format off
-    [[nodiscard]] virtual ui::HandleEventResult handle_event(
-        ui::Event const& event,
-        ui::EventSystem const& event_system
-    ) { // clang-format on
-        auto const focus_manager_result = m_focus_manager.handle_event(event, event_system);
+    [[nodiscard]] virtual ui::HandleEventResult handle_event(ui::Event const& event) {
+        auto const focus_manager_result = m_focus_manager.handle_event(event);
         auto const user_interface_result = m_user_interface->handle_event(event);
         return (focus_manager_result == ui::HandleEventResult::EventHandled
                 or user_interface_result == ui::HandleEventResult::EventHandled)
@@ -51,8 +48,8 @@ public:
         m_user_interface->render(renderer);
     }
 
-    virtual void on_window_resized(utils::IntRect const area) {
-        m_user_interface->recalculate_absolute_area(area);
+    virtual void on_window_resized() {
+        m_user_interface->recalculate_absolute_area(m_service_provider->window().area());
     }
 
 protected:

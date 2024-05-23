@@ -67,9 +67,9 @@ namespace view {
 
     // clang-format off
     [[nodiscard]] ui::HandleEventResult View::handle_event(
-        ui::Event const& event,
-        ui::EventSystem const& event_system
+        ui::Event const& event
     ) { // clang-format on
+        auto const& event_system = m_service_provider->window().event_system();
         if (auto const mouse_wheel_moved = std::get_if<ui::MouseWheelMoved>(&event)) {
             if (m_camera.viewport().contains(event_system.mouse_position())) {
                 m_camera.zoom_towards(1.0f + mouse_wheel_moved->delta.y * 0.1f, event_system.mouse_position());
@@ -84,7 +84,9 @@ namespace view {
         return ui::HandleEventResult::EventNotHandled;
     }
 
-    void View::update(Galaxy const& galaxy, ui::EventSystem const& event_system, float const delta_seconds) {
+    void View::update(Galaxy const& galaxy) {
+        auto const& event_system = m_service_provider->window().event_system();
+        auto const delta_seconds = m_service_provider->window().delta_seconds();
         static constexpr auto scroll_speed = 0.1f;
         static constexpr auto zoom_factor = 1.2f;
         m_camera.update(*m_service_provider);

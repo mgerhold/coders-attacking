@@ -24,9 +24,9 @@ namespace view {
 
         void render_game(Galaxy const& galaxy, gfx::Renderer& renderer) const;
 
-        [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event, ui::EventSystem const& event_system);
+        [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event);
 
-        void update(Galaxy const& galaxy, ui::EventSystem const& event_system, float delta_seconds);
+        void update(Galaxy const& galaxy);
 
         void on_window_resized(utils::IntRect const viewport) {
             m_camera.set_viewport(viewport);

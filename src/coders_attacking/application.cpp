@@ -39,15 +39,16 @@ void Application::run() {
         render();
     }
 }
+
 void Application::handle_events() {
     m_window.poll_events();
     while (auto const event = m_window.next_event()) {
-        m_scene_stack.handle_event(event.value(), m_window.event_system());
+        m_scene_stack.handle_event(event.value());
     }
 }
 
 void Application::update() {
-    m_scene_stack.update(m_window.event_system(), m_window.delta_seconds());
+    m_scene_stack.update();
 }
 
 void Application::render() const {

@@ -1,3 +1,6 @@
+#include "gfx/window.hpp"
+
+
 #include <ui/focus_manager.hpp>
 #include <ui/widget.hpp>
 
@@ -14,7 +17,8 @@ namespace ui {
         return false;
     }
 
-    [[nodiscard]] HandleEventResult FocusManager::handle_event(Event const event, EventSystem const& event_system) {
+    [[nodiscard]] HandleEventResult FocusManager::handle_event(Event const event) {
+        auto const& event_system = m_service_provider->window().event_system();
         if (auto const key_pressed = std::get_if<KeyPressed>(&event)) {
             if (key_pressed->key == Key::Tab) {
                 if (event_system.is_key_down(Key::LeftShift) or event_system.is_key_down(Key::RightShift)) {

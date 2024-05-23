@@ -22,22 +22,22 @@ TestScene::TestScene(ServiceProvider& service_provider)
     m_focused_planet_label = &find_widget<Label>("label_focused_planet");
 }
 
-Scene::UpdateResult TestScene::update(EventSystem const& event_system, float const delta_seconds) {
+Scene::UpdateResult TestScene::update() {
     if (not m_running) {
         end_scene();
     }
-    m_game_view.update(m_galaxy, event_system, delta_seconds);
+    m_game_view.update(m_galaxy);
     m_focused_planet_label->caption(
             m_game_view.focused_planet().has_value() ? m_game_view.focused_planet()->get_component<Planet>()->name : ""
     );
     return UpdateResult::KeepUpdating;
 }
 
-HandleEventResult TestScene::handle_event(Event const& event, EventSystem const& event_system) {
-    if (Scene::handle_event(event, event_system) == HandleEventResult::EventHandled) {
+HandleEventResult TestScene::handle_event(Event const& event) {
+    if (Scene::handle_event(event) == HandleEventResult::EventHandled) {
         return HandleEventResult::EventHandled;
     }
-    return m_game_view.handle_event(event, event_system);
+    return m_game_view.handle_event(event);
 }
 
 void TestScene::render(gfx::Renderer& renderer) const {
@@ -45,8 +45,8 @@ void TestScene::render(gfx::Renderer& renderer) const {
     Scene::render(renderer);
 }
 
-void TestScene::on_window_resized(IntRect const area) {
-    Scene::on_window_resized(area);
+void TestScene::on_window_resized() {
+    Scene::on_window_resized();
     m_game_view.on_window_resized(game_viewport());
 }
 

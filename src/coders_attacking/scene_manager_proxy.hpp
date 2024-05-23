@@ -14,6 +14,14 @@ private:
     bool m_should_delete_current_scene{ false };
     std::vector<std::unique_ptr<Scene>> m_scenes_to_push;
 
+    [[nodiscard]] bool reset_should_delete_current_scene() {
+        return std::exchange(m_should_delete_current_scene, false);
+    }
+
+    [[nodiscard]] std::vector<std::unique_ptr<Scene>> take_scenes_to_push() {
+        return std::move(m_scenes_to_push);
+    }
+
 public:
     void end_scene() override;
     void enqueue(std::unique_ptr<Scene> scene) override;

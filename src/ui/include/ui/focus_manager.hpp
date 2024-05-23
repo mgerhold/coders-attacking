@@ -2,6 +2,7 @@
 
 #include "event_system.hpp"
 #include "widget.hpp"
+#include <common/service_provider.hpp>
 #include <lib2k/types.hpp>
 #include <tl/optional.hpp>
 
@@ -10,11 +11,14 @@ namespace ui {
 
     class FocusManager final {
     private:
+        ServiceProvider* m_service_provider;
         tl::optional<Widget&> m_focused_widget;
         Widget* m_root;
 
     public:
-        explicit FocusManager(Widget& root) : m_root{ &root } {
+        explicit FocusManager(ServiceProvider& service_provider, Widget& root)
+            : m_service_provider{ &service_provider },
+              m_root{ &root } {
             m_root->register_focus_manager(*this);
             auto_focus();
         }
@@ -52,7 +56,7 @@ namespace ui {
             }
         }
 
-        [[nodiscard]] HandleEventResult handle_event(Event event, EventSystem const& event_system);
+        [[nodiscard]] HandleEventResult handle_event(Event event);
 
     private:
         void next();

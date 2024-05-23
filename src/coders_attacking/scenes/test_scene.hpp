@@ -25,17 +25,16 @@ public:
     TestScene& operator=(TestScene&& other) noexcept = delete;
     ~TestScene() override = default;
 
-    [[nodiscard]] UpdateResult update(ui::EventSystem const& event_system, float delta_seconds) override;
+    [[nodiscard]] UpdateResult update() override;
 
     // clang-format off
     [[nodiscard]] ui::HandleEventResult handle_event(
-        ui::Event const& event,
-        ui::EventSystem const& event_system
+        ui::Event const& event
     ) override;
     // clang-format on
 
     void render(gfx::Renderer& renderer) const override;
-    void on_window_resized(utils::IntRect area) override;
+    void on_window_resized() override;
 
 private:
     template<typename T>
