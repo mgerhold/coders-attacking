@@ -37,28 +37,27 @@ namespace view {
         void render(
             gfx::Renderer& renderer,
             Camera const& camera,
-            float const elapsed_time
+            double const elapsed_time
         ) const { // clang-format on
             using namespace utils;
             static constexpr auto pi = std::numbers::pi_v<float>;
-            auto const brightness = std::clamp(
-                    std::sin(elapsed_time * 2.0f * pi / m_period) * m_amplitude + m_base_brightness,
-                    0.0f,
-                    1.0f
+            auto const brightness = static_cast<float>(
+                    std::clamp(std::sin(elapsed_time * 2.0 * pi / m_period) * m_amplitude + m_base_brightness, 0.0, 1.0)
             );
             auto const color = Color{
                 static_cast<u8>(static_cast<float>(m_color.r) * brightness),
                 static_cast<u8>(static_cast<float>(m_color.g) * brightness),
                 static_cast<u8>(static_cast<float>(m_color.b) * brightness),
             };
-            auto const position =
-                    m_position
-                    + Vec2f{ std::sin(elapsed_time / 5.0f), std::cos(elapsed_time / 3.0f) } * 0.001f / m_distance;
+            auto const position = m_position
+                                  + Vec2f{ static_cast<float>(std::sin(elapsed_time / 5.0)),
+                                           static_cast<float>(std::cos(elapsed_time / 3.0)) }
+                                            * 0.001f / m_distance;
             auto const screen_coords = camera.world_to_screen_coords(position, m_distance);
             if (not camera.viewport().contains(screen_coords)) {
                 return;
             }
-            renderer.draw_circle(screen_coords, m_size, color);
+            renderer.draw_filled_circle(screen_coords, m_size, color);
         }
 
         [[nodiscard]] static BackgroundStar random(c2k::Random& random) {

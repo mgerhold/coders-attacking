@@ -15,7 +15,6 @@ namespace view {
     private:
         Camera m_camera;
         std::vector<BackgroundStar> m_background_stars;
-        float m_elapsed_time = 0.0f;
         tl::optional<GameObject const&> m_focused_planet;
         ServiceProvider* m_service_provider;
 

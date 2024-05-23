@@ -33,7 +33,7 @@ namespace view {
         renderer.draw_filled_rectangle(m_camera.viewport(), Color::Black);
 
         for (auto const& star : m_background_stars) {
-            star.render(renderer, m_camera, m_elapsed_time);
+            star.render(renderer, m_camera, m_service_provider->window().elapsed_seconds());
         }
 
         for (auto const& game_object : galaxy.game_objects()) {
@@ -44,7 +44,28 @@ namespace view {
                 if (not m_camera.viewport().contains(screen_coords)) {
                     continue;
                 }
-                renderer.draw_circle(screen_coords, 5.0f, planet->color);
+
+                if (auto const owner_uuid = planet->owner.target_uuid()) {
+                    static constexpr auto num_radio_circles = 6;
+                    static constexpr auto radio_animation_speed = 0.1;
+                    for (auto i = 0; i < num_radio_circles; ++i) {
+                        static constexpr auto min_radio_radius = 5.0;
+                        auto const max_radio_radius = m_service_provider->window().area().size.x / 12.0;
+                        auto const player = galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>();
+                        auto const time = m_service_provider->window().elapsed_seconds() / (1.0 / radio_animation_speed)
+                                          + static_cast<double>(i) * 1.0 / num_radio_circles;
+                        auto const relative = std::abs(time - std::floor(time));
+                        auto const radius =
+                                static_cast<float>(min_radio_radius + relative * (max_radio_radius - min_radio_radius));
+                        renderer.draw_circle(screen_coords, radius, player->color * (1.0 - relative));
+                    }
+                }
+
+                renderer.draw_filled_circle(screen_coords, 5.0f, planet->color);
+
+                if (m_focused_planet.has_value() and m_focused_planet == game_object) {
+                    renderer.draw_circle(screen_coords, 9.0f, planet->color);
+                }
 
                 static constexpr auto font_size = 20;
                 auto text_size = Vec2i{ font.measure_text(planet->name.c_str(), font_size) };
@@ -91,22 +112,22 @@ namespace view {
         static constexpr auto zoom_factor = 1.2f;
         m_camera.update(*m_service_provider);
         if (event_system.is_key_down(ui::Key::Left)) {
-            m_camera.move({ -scroll_speed * delta_seconds, 0.0f });
+            m_camera.move({ -scroll_speed * static_cast<float>(delta_seconds), 0.0f });
         }
         if (event_system.is_key_down(ui::Key::Right)) {
-            m_camera.move({ scroll_speed * delta_seconds, 0.0f });
+            m_camera.move({ scroll_speed * static_cast<float>(delta_seconds), 0.0f });
         }
         if (event_system.is_key_down(ui::Key::Up)) {
-            m_camera.move({ 0.0f, -scroll_speed * delta_seconds });
+            m_camera.move({ 0.0f, -scroll_speed * static_cast<float>(delta_seconds) });
         }
         if (event_system.is_key_down(ui::Key::Down)) {
-            m_camera.move({ 0.0f, scroll_speed * delta_seconds });
+            m_camera.move({ 0.0f, scroll_speed * static_cast<float>(delta_seconds) });
         }
         if (event_system.is_key_down(ui::Key::KpAdd)) {
-            m_camera.zoom((zoom_factor - 1.0f) * delta_seconds + 1.0f);
+            m_camera.zoom((zoom_factor - 1.0f) * static_cast<float>(delta_seconds) + 1.0f);
         }
         if (event_system.is_key_down(ui::Key::KpSubtract)) {
-            m_camera.zoom(-(zoom_factor - 1.0f) * delta_seconds + 1.0f);
+            m_camera.zoom(-(zoom_factor - 1.0f) * static_cast<float>(delta_seconds) + 1.0f);
         }
         if (event_system.is_mouse_button_down(ui::MouseButton::Right)
             and m_camera.viewport().contains(event_system.mouse_position())) {
@@ -132,6 +153,5 @@ namespace view {
         if (not a_planet_is_focused) {
             m_focused_planet = tl::nullopt;
         }
-        m_elapsed_time += delta_seconds;
     }
 } // namespace view

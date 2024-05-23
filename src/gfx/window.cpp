@@ -36,8 +36,12 @@ namespace gfx {
         set_window_flag(FLAG_WINDOW_RESIZABLE, enabled);
     }
 
-    [[nodiscard]] float Window::delta_seconds() const {
-        return GetFrameTime();
+    [[nodiscard]] double Window::delta_seconds() const {
+        return static_cast<double>(GetFrameTime());
+    }
+
+    [[nodiscard]] double Window::elapsed_seconds() const {
+        return GetTime();
     }
 
     [[nodiscard]] tl::optional<Font> Window::load_font(char const* filename, int font_size) const {

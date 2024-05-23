@@ -41,6 +41,7 @@ namespace gfx {
                 utils::Color color
         );
         void draw_circle(utils::Vec2i center, float radius, utils::Color color);
+        void draw_filled_circle(utils::Vec2i center, float radius, utils::Color color);
         void draw_fps(utils::Vec2i position);
     };
 } // namespace gfx

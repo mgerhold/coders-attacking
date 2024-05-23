@@ -18,6 +18,7 @@ TestScene::TestScene(ServiceProvider& service_provider)
       m_game_view{ service_provider } {
     find_widget<Button>("button_save").on_click([&](Button&) { save(); });
     find_widget<Button>("button_load").on_click([&](Button&) { load(); });
+    find_widget<Button>("button_regenerate").on_click([&](Button&) { regenerate(); });
     find_widget<Button>("button_exit").on_click([&](Button&) { m_running = false; });
     m_focused_planet_label = &find_widget<Label>("label_focused_planet");
 }
@@ -27,17 +28,7 @@ Scene::UpdateResult TestScene::update() {
         end_scene();
     }
     m_game_view.update(m_galaxy);
-
-    if (auto const& planet = m_game_view.focused_planet()) {
-        auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
-        if (auto const owner_uuid = planet->get_component<Planet>().value().owner.target_uuid()) {
-            auto const owner = m_galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>().value();
-            caption += std::format(" ({})", owner.name);
-        }
-        m_focused_planet_label->caption(caption);
-    } else {
-        m_focused_planet_label->caption("");
-    }
+    update_focused_planet_label();
     return UpdateResult::KeepUpdating;
 }
 
@@ -70,6 +61,10 @@ void TestScene::load() {
     m_galaxy = nlohmann::json::parse(read_file(savegame_filename).value()).get<Galaxy>();
 }
 
+void TestScene::regenerate() {
+    m_galaxy = create_galaxy();
+}
+
 [[nodiscard]] IntRect TestScene::game_viewport() const {
     auto const size = service_provider().window().area().size;
     return IntRect{
@@ -83,12 +78,13 @@ void TestScene::load() {
         auto layout = std::make_unique<GridLayout>(
                 16,
                 12,
-                GridLayout::Area{{0,0},{1,12}},
-                GridLayout::Area{{1,11},{15,1}},
-                GridLayout::Area{{0,0},{1,1}},
-                GridLayout::Area{{0,1},{1,1}},
-                GridLayout::Area{ { 14, 11 }, { 2, 1 } },
-                GridLayout::Area{ { 1, 11 }, { 5, 1 } }
+                GridLayout::Area{{0,0},{1,12}}, // left panel
+                GridLayout::Area{{1,11},{15,1}}, // bottom panel
+                GridLayout::Area{{0,0},{1,1}}, // save button
+                GridLayout::Area{{0,1},{1,1}}, // load button
+                GridLayout::Area{{0,2},{1,1}}, // regenerate button
+                GridLayout::Area{ { 14, 11 }, { 2, 1 } }, // exit button
+                GridLayout::Area{ { 1, 11 }, { 5, 1 } } // focused planet label
             );
     // clang-format on
     auto const& font = service_provider.resource_manager().font(FontType::Roboto);
@@ -99,6 +95,7 @@ void TestScene::load() {
             std::make_unique<Panel>(frame_color),
             std::make_unique<Button>(WidgetName{ "button_save" }, "Save", 1, font),
             std::make_unique<Button>(WidgetName{ "button_load" }, "Load", 2, font),
+            std::make_unique<Button>(WidgetName{ "button_regenerate" }, "Regenerate", 3, font),
             std::make_unique<Button>(WidgetName{ "button_exit" }, "Exit", 0, font),
             std::make_unique<Label>(
                     WidgetName{ "label_focused_planet" },
@@ -221,4 +218,19 @@ void TestScene::load() {
 
 
     return galaxy;
+}
+
+void TestScene::update_focused_planet_label() const {
+    if (auto const& planet = m_game_view.focused_planet()) {
+        auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
+        if (auto const owner_uuid = planet->get_component<Planet>().value().owner.target_uuid()) {
+            auto const owner = m_galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>().value();
+            caption += std::format(" ({})", owner.name);
+        }
+        m_focused_planet_label->caption(caption);
+
+        return;
+    }
+
+    m_focused_planet_label->caption("");
 }

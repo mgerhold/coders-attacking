@@ -64,6 +64,10 @@ namespace gfx {
     }
 
     void Renderer::draw_circle(utils::Vec2i const center, float const radius, utils::Color const color) {
+        DrawCircleLines(center.x, center.y, radius, to_raylib(color));
+    }
+
+    void Renderer::draw_filled_circle(utils::Vec2i const center, float const radius, utils::Color const color) {
         DrawCircle(center.x, center.y, radius, to_raylib(color));
     }
 

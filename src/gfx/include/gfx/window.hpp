@@ -24,7 +24,8 @@ namespace gfx {
         [[nodiscard]] utils::IntRect area() const;
         void set_resizable(bool enabled);
 
-        [[nodiscard]] float delta_seconds() const;
+        [[nodiscard]] double delta_seconds() const;
+        [[nodiscard]] double elapsed_seconds() const;
 
         [[nodiscard]] tl::optional<Font> load_font(char const* filename, int font_size) const;
         [[nodiscard]] bool was_resized() const;

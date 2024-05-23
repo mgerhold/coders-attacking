@@ -2,9 +2,9 @@
 
 #include <lib2k/random.hpp>
 #include <lib2k/types.hpp>
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
-#include <nlohmann/json.hpp>
 
 namespace utils {
     struct Color {
@@ -130,6 +130,21 @@ namespace utils {
                     *this = { 0, 0, 0, 255 };
                     break;
             }
+        }
+
+        template<std::floating_point T>
+        [[nodiscard]] Color operator*(T const scalar) const {
+            return Color{
+                static_cast<u8>(std::clamp(static_cast<T>(r) * scalar, T{ 0.0 }, T{ 255.0 })),
+                static_cast<u8>(std::clamp(static_cast<T>(g) * scalar, T{ 0.0 }, T{ 255.0 })),
+                static_cast<u8>(std::clamp(static_cast<T>(b) * scalar, T{ 0.0 }, T{ 255.0 })),
+                a,
+            };
+        }
+
+        template<std::floating_point T>
+        [[nodiscard]] friend Color operator*(T const scalar, Color const color) {
+            return color * scalar;
         }
 
         [[nodiscard]] static Color random(c2k::Random& random) {

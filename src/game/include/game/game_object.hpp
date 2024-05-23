@@ -65,6 +65,10 @@ public:
         return m_name;
     }
 
+    [[nodiscard]] bool operator==(GameObject const& other) const {
+        return m_uuid == other.uuid();
+    }
+
 private:
     [[nodiscard]] static std::string next_name() {
         return std::format("GameObject{}", s_name_generator_counter++);

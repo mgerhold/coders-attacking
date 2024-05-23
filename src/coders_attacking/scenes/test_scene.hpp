@@ -26,13 +26,7 @@ public:
     ~TestScene() override = default;
 
     [[nodiscard]] UpdateResult update() override;
-
-    // clang-format off
-    [[nodiscard]] ui::HandleEventResult handle_event(
-        ui::Event const& event
-    ) override;
-    // clang-format on
-
+    [[nodiscard]] ui::HandleEventResult handle_event(ui::Event const& event) override;
     void render(gfx::Renderer& renderer) const override;
     void on_window_resized() override;
 
@@ -44,7 +38,10 @@ private:
 
     void save() const;
     void load();
+    void regenerate();
+
     [[nodiscard]] utils::IntRect game_viewport() const;
     [[nodiscard]] static std::unique_ptr<ui::Widget> create_user_interface(ServiceProvider& service_provider);
     [[nodiscard]] static Galaxy create_galaxy();
+    void update_focused_planet_label() const;
 };
