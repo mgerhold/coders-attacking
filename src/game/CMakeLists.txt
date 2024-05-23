@@ -4,6 +4,7 @@ add_library(game STATIC
         include/game/galaxy.hpp
         include/game/uuid.hpp
         uuid.cpp
+        galaxy.cpp
 )
 
 target_link_libraries(game

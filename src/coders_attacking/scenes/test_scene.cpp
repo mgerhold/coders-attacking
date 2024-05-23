@@ -27,9 +27,17 @@ Scene::UpdateResult TestScene::update() {
         end_scene();
     }
     m_game_view.update(m_galaxy);
-    m_focused_planet_label->caption(
-            m_game_view.focused_planet().has_value() ? m_game_view.focused_planet()->get_component<Planet>()->name : ""
-    );
+
+    if (auto const& planet = m_game_view.focused_planet()) {
+        auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
+        if (auto const owner_uuid = planet->get_component<Planet>().value().owner.target_uuid()) {
+            auto const owner = m_galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>().value();
+            caption += std::format(" ({})", owner.name);
+        }
+        m_focused_planet_label->caption(caption);
+    } else {
+        m_focused_planet_label->caption("");
+    }
     return UpdateResult::KeepUpdating;
 }
 
@@ -165,6 +173,31 @@ void TestScene::load() {
 
     auto galaxy = Galaxy{};
     auto random = Random{};
+
+    auto player0 = GameObject{ "Player0" };
+    player0.add_component<Player>(Player{
+            "coder2k",
+            { 63, 22, 126 },
+    });
+    galaxy.game_objects().push_back(player0);
+
+    auto player1 = GameObject{ "Player1" };
+    player1.add_component<Player>(Player{
+            "r00tifant",
+            { 241, 196, 15 },
+    });
+    galaxy.game_objects().push_back(player1);
+
+    auto const home_planet_0 = random.next_integral(usize{ 0 }, galaxy.game_settings().num_planets);
+    auto const home_planet_1 = std::invoke([&]() {
+        while (true) {
+            auto const number = random.next_integral(usize{ 0 }, galaxy.game_settings().num_planets);
+            if (number != home_planet_0) {
+                return number;
+            }
+        }
+    });
+
     auto shuffled_planet_names = std::vector<std::string>{ planet_names.begin(), planet_names.end() };
     std::shuffle(shuffled_planet_names.begin(), shuffled_planet_names.end(), std::mt19937{ std::random_device{}() });
     for (auto i = usize{ 0 }; i < galaxy.game_settings().num_planets; ++i) {
@@ -178,7 +211,14 @@ void TestScene::load() {
         assert(i < shuffled_planet_names.size());
         auto planet_name = shuffled_planet_names.at(i);
         game_object.emplace_component<Planet>(std::move(planet_name), 10, color);
+        if (i == home_planet_0) {
+            game_object.get_component<Planet>().value().owner = player0.uuid();
+        } else if (i == home_planet_1) {
+            game_object.get_component<Planet>().value().owner = player1.uuid();
+        }
         galaxy.game_objects().push_back(game_object);
     }
+
+
     return galaxy;
 }

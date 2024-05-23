@@ -2,8 +2,7 @@
 
 #include <nlohmann/json.hpp>
 #include <stduuid/uuid.h>
-
-[[nodiscard]] uuids::uuid generate_uuid();
+#include <tl/optional.hpp>
 
 namespace nlohmann {
     template<>
@@ -26,3 +25,23 @@ namespace nlohmann {
         }
     };
 } // namespace nlohmann
+
+[[nodiscard]] uuids::uuid generate_uuid();
+
+class NullableUuidReference final {
+private:
+    uuids::uuid m_target;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NullableUuidReference, m_target);
+
+public:
+    NullableUuidReference() = default;
+    NullableUuidReference(uuids::uuid const target) : m_target{ target } { } // NOLINT (implicit constructor)
+
+    [[nodiscard]] tl::optional<uuids::uuid> target_uuid() const {
+        if (m_target.is_nil()) {
+            return tl::nullopt;
+        }
+        return m_target;
+    }
+};

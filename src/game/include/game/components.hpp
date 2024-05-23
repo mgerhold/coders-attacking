@@ -1,5 +1,6 @@
 #pragma once
 
+#include "uuid.hpp"
 #include <format>
 #include <lib2k/concepts.hpp>
 #include <lib2k/types.hpp>
@@ -9,14 +10,23 @@
 #include <utils/vec2.hpp>
 #include <variant>
 
+struct Player final {
+    static constexpr auto type = "Player";
+    std::string name;
+    utils::Color color;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Player, name, color);
+
 struct Planet final {
     static constexpr auto type = "Planet";
     std::string name;
     usize production_per_turn{ 0 };
     utils::Color color;
+    NullableUuidReference owner;
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Planet, name, production_per_turn, color);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Planet, name, production_per_turn, color, owner);
 
 struct Transform final {
     static constexpr auto type = "Transform";
@@ -25,10 +35,10 @@ struct Transform final {
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position);
 
-using Component = std::variant<Planet, Transform>;
+using Component = std::variant<Player, Planet, Transform>;
 
 template<typename T>
-concept IsComponent = c2k::IsOneOf<T, Planet, Transform>;
+concept IsComponent = c2k::IsOneOf<T, Player, Planet, Transform>;
 
 template<typename... Ts>
 struct Overloaded : Ts... {
@@ -38,6 +48,19 @@ struct Overloaded : Ts... {
 template<typename T, typename Visitor>
 auto visit(T t, Visitor v) {
     return std::visit(v, t);
+}
+
+inline void from_json(nlohmann::json const& j, Component& component) {
+    auto const& type = j.at("type");
+    if (type == Player::type) {
+        component = j.get<Player>();
+    } else if (type == Planet::type) {
+        component = j.get<Planet>();
+    } else if (type == Transform::type) {
+        component = j.get<Transform>();
+    } else {
+        throw std::runtime_error{ std::format("'{}' is not a known component type", type.get<std::string>()) };
+    }
 }
 
 inline void to_json(nlohmann::json& j, Component const& component) {
@@ -66,15 +89,4 @@ inline void to_json(nlohmann::json& j, Component const& component) {
     j = std::move(result);
 
     // clang-format on
-}
-
-inline void from_json(nlohmann::json const& j, Component& component) {
-    auto const& type = j.at("type");
-    if (type == Planet::type) {
-        component = j.get<Planet>();
-    } else if (type == Transform::type) {
-        component = j.get<Transform>();
-    } else {
-        throw std::runtime_error{ std::format("'{}' is not a known component type", type.get<std::string>()) };
-    }
 }

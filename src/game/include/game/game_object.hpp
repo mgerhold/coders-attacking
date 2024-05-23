@@ -46,6 +46,25 @@ public:
         return tl::nullopt;
     }
 
+    template<IsComponent C>
+    [[nodiscard]] tl::optional<C&> get_component() {
+        static_assert(std::same_as<C, std::decay_t<C>>);
+        for (auto& component : m_components) {
+            if (std::holds_alternative<C>(component)) {
+                return std::get<C>(component);
+            }
+        }
+        return tl::nullopt;
+    }
+
+    [[nodiscard]] uuids::uuid const& uuid() const {
+        return m_uuid;
+    }
+
+    [[nodiscard]] std::string const& name() const {
+        return m_name;
+    }
+
 private:
     [[nodiscard]] static std::string next_name() {
         return std::format("GameObject{}", s_name_generator_counter++);

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "game_object.hpp"
+#include "uuid.hpp"
 #include <lib2k/types.hpp>
+#include <vector>
 
-struct GameSettings {
+struct GameSettings final {
     usize num_planets{ 20 };
 };
 
@@ -28,4 +30,6 @@ public:
     [[nodiscard]] GameSettings const& game_settings() const {
         return m_game_settings;
     }
+
+    [[nodiscard]] tl::optional<GameObject const&> find_game_object(uuids::uuid uuid) const;
 };
