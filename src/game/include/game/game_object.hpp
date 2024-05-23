@@ -1,17 +1,27 @@
 #pragma once
 
 #include "components.hpp"
+#include "uuid.hpp"
 #include <stdexcept>
 #include <tl/optional.hpp>
 #include <vector>
 
 class GameObject final {
 private:
+    uuids::uuid m_uuid;
+    std::string m_name;
     std::vector<Component> m_components;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameObject, m_components);
+    static inline std::size_t s_name_generator_counter{ 0 };
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameObject, m_uuid, m_name, m_components);
 
 public:
+    GameObject() : GameObject{ next_name() } { }
+    explicit GameObject(std::string name) : GameObject{ generate_uuid(), std::move(name) } { }
+    explicit GameObject(uuids::uuid const uuid) : GameObject{ uuid, next_name() } { }
+    explicit GameObject(uuids::uuid const uuid, std::string name) : m_uuid{ uuid }, m_name{ std::move(name) } { }
+
     void add_component(IsComponent auto&& component) {
         emplace_component<std::decay_t<decltype(component)>>(std::forward<decltype(component)>(component));
     }
@@ -34,5 +44,10 @@ public:
             }
         }
         return tl::nullopt;
+    }
+
+private:
+    [[nodiscard]] static std::string next_name() {
+        return std::format("GameObject{}", s_name_generator_counter++);
     }
 };
