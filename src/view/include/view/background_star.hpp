@@ -100,5 +100,13 @@ namespace view {
             });
             return BackgroundStar{ position, size, brightness, period, amplitude, distance, color };
         }
+
+        [[nodiscard]] utils::Vec2f position() const {
+            return m_position;
+        }
+
+        [[nodiscard]] float distance() const {
+            return m_distance;
+        }
     };
 } // namespace view

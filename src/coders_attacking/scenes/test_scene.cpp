@@ -15,7 +15,7 @@ using namespace c2k;
 TestScene::TestScene(ServiceProvider& service_provider)
     : Scene{ service_provider, create_user_interface(service_provider) },
       m_galaxy{ create_galaxy() },
-      m_game_view{ service_provider } {
+      m_game_view{ service_provider, Random{}.next_integral<Random::Seed>() } {
     find_widget<Button>("button_save").on_click([&](Button&) { save(); });
     find_widget<Button>("button_load").on_click([&](Button&) { load(); });
     find_widget<Button>("button_regenerate").on_click([&](Button&) { regenerate(); });
@@ -63,6 +63,7 @@ void TestScene::load() {
 
 void TestScene::regenerate() {
     m_galaxy = create_galaxy();
+    m_game_view.regenerate_background_stars(Random{}.next_integral<Random::Seed>());
 }
 
 [[nodiscard]] IntRect TestScene::game_viewport() const {

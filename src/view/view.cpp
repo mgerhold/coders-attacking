@@ -11,22 +11,26 @@
 namespace view {
     using namespace utils;
 
-    View::View(ServiceProvider& service_provider)
+    View::View(ServiceProvider& service_provider, c2k::Random::Seed const background_stars_seed)
         : m_camera{
               0.9f,
               10.0f,
               service_provider.window().area(),
               FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.4f),
           }, m_service_provider{ &service_provider } {
-        static constexpr auto num_background_stars = usize{ 1500 * 3 };
-        auto random = c2k::Random{};
-        for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
-            m_background_stars.emplace_back(BackgroundStar::random(random));
-        }
+        regenerate_background_stars(background_stars_seed);
     }
 
     void View::render_game(Galaxy const& galaxy, gfx::Renderer& renderer) const {
         using namespace utils;
+
+        static constexpr auto min_radio_radius = 5.0;
+        auto const max_radio_radius = m_camera.world_to_view_coords(Vec2f{ 1.0f, 1.0f } * 100.0f).magnitude();
+
+        auto const first_player_it = std::ranges::find_if(galaxy.game_objects(), [](GameObject const& game_object) {
+            return game_object.get_component<Player>().has_value();
+        });
+        auto const current_player_uuid = first_player_it->uuid();
 
         auto const& font = m_service_provider->resource_manager().font(FontType::Roboto);
 
@@ -39,6 +43,10 @@ namespace view {
         for (auto const& game_object : galaxy.game_objects()) {
             if (auto const planet = game_object.get_component<Planet>()) {
                 auto const transform = game_object.get_component<Transform>();
+                auto const visibility = determine_visibility(0.2f, galaxy, current_player_uuid, transform->position);
+                if (not visibility.has_value()) {
+                    continue;
+                }
                 auto const view_coords = m_camera.world_to_view_coords(transform->position);
                 auto const screen_coords = m_camera.view_to_screen_coords(view_coords);
 
@@ -46,9 +54,6 @@ namespace view {
                     static constexpr auto num_radio_circles = 6;
                     static constexpr auto radio_animation_speed = 0.1;
                     for (auto i = 0; i < num_radio_circles; ++i) {
-                        static constexpr auto min_radio_radius = 5.0;
-                        auto const max_radio_radius =
-                                m_camera.world_to_view_coords(Vec2f{ 1.0f, 1.0f } * 100.0f).magnitude();
                         auto const player = galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>();
                         auto const time = m_service_provider->window().elapsed_seconds() / (1.0 / radio_animation_speed)
                                           + static_cast<double>(i) * 1.0 / num_radio_circles;
@@ -160,5 +165,45 @@ namespace view {
         if (not a_planet_is_focused) {
             m_focused_planet = tl::nullopt;
         }
+    }
+
+    void View::regenerate_background_stars(c2k::Random::Seed const seed) {
+        m_background_stars.clear();
+        auto random = c2k::Random{ seed };
+        for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
+            m_background_stars.emplace_back(BackgroundStar::random(random));
+        }
+    }
+
+    [[nodiscard]] tl::optional<float> View::determine_visibility(
+            float const max_radius,
+            Galaxy const& galaxy,
+            uuids::uuid const current_player_uuid,
+            Vec2f world_position
+    ) const {
+        float min_distance_to_owned_planet = std::numeric_limits<float>::max();
+        for (auto const& game_object : galaxy.game_objects()) {
+            // clang-format off
+            if (
+                auto const& planet = game_object.get_component<Planet>();
+                planet.has_value()
+                and planet->owner == current_player_uuid
+            ) {
+                auto const distance = (
+                        game_object.get_component<Transform>().value().position - world_position
+                    ).magnitude();
+                // clang-format on
+                if (distance < min_distance_to_owned_planet) {
+                    min_distance_to_owned_planet = distance;
+                }
+            }
+        }
+        if (min_distance_to_owned_planet > max_radius) {
+            return tl::nullopt;
+        }
+        auto const brightness = (min_distance_to_owned_planet <= 0.5f * max_radius)
+                                        ? 1.0f
+                                        : 1.0f - (min_distance_to_owned_planet / (0.5f * max_radius) - 1.0f);
+        return brightness;
     }
 } // namespace view

@@ -44,4 +44,16 @@ public:
         }
         return m_target;
     }
+
+    [[nodiscard]] friend bool operator==(NullableUuidReference const lhs, NullableUuidReference const rhs) {
+        return lhs.target_uuid() == rhs.target_uuid();
+    }
+
+    [[nodiscard]] friend bool operator==(NullableUuidReference const lhs, uuids::uuid const rhs) {
+        return lhs.m_target == rhs;
+    }
+
+    [[nodiscard]] friend bool operator==(uuids::uuid const lhs, NullableUuidReference const rhs) {
+        return rhs == lhs;
+    }
 };
