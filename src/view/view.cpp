@@ -41,23 +41,30 @@ namespace view {
                 auto const transform = game_object.get_component<Transform>();
                 auto const view_coords = m_camera.world_to_view_coords(transform->position);
                 auto const screen_coords = m_camera.view_to_screen_coords(view_coords);
-                if (not m_camera.viewport().contains(screen_coords)) {
-                    continue;
-                }
 
                 if (auto const owner_uuid = planet->owner.target_uuid()) {
                     static constexpr auto num_radio_circles = 6;
                     static constexpr auto radio_animation_speed = 0.1;
                     for (auto i = 0; i < num_radio_circles; ++i) {
                         static constexpr auto min_radio_radius = 5.0;
-                        auto const max_radio_radius = m_service_provider->window().area().size.x / 12.0;
+                        auto const max_radio_radius =
+                                m_camera.world_to_view_coords(Vec2f{ 1.0f, 1.0f } * 100.0f).magnitude();
                         auto const player = galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>();
                         auto const time = m_service_provider->window().elapsed_seconds() / (1.0 / radio_animation_speed)
                                           + static_cast<double>(i) * 1.0 / num_radio_circles;
                         auto const relative = std::abs(time - std::floor(time));
                         auto const radius =
                                 static_cast<float>(min_radio_radius + relative * (max_radio_radius - min_radio_radius));
-                        renderer.draw_circle(screen_coords, radius, player->color * (1.0 - relative));
+                        renderer.draw_circle(
+                                screen_coords,
+                                radius,
+                                Color{
+                                        player->color.r,
+                                        player->color.g,
+                                        player->color.b,
+                                        static_cast<u8>(255.0 * (1.0 - relative)),
+                                }
+                        );
                     }
                 }
 
