@@ -1,11 +1,11 @@
-#include "common/resource_manager.hpp"
-#include "view/background_star.hpp"
 #include <cmath>
+#include <common/resource_manager.hpp>
 #include <gfx/window.hpp>
 #include <lib2k/random.hpp>
 #include <numbers>
 #include <ranges>
 #include <spdlog/spdlog.h>
+#include <view/background_star.hpp>
 #include <view/view.hpp>
 
 namespace view {
@@ -34,7 +34,16 @@ namespace view {
 
         auto const& font = m_service_provider->resource_manager().font(FontType::Roboto);
 
+        // clear background
         renderer.draw_filled_rectangle(m_camera.viewport(), Color::Black);
+
+        // draw current command selection
+        if (m_selection_start.has_value()) {
+            auto const start_position =
+                    m_camera.world_to_screen_coords(m_selection_start->get_component<Transform>().value().position);
+            auto const end_position = m_service_provider->window().event_system().mouse_position();
+            renderer.draw_line(start_position, end_position, Color{ 173, 216, 230 });
+        }
 
         for (auto const& star : m_background_stars) {
             star.render(renderer, m_camera, m_service_provider->window().elapsed_seconds());
@@ -107,6 +116,15 @@ namespace view {
             if (m_camera.viewport().contains(event_system.mouse_position())) {
                 m_camera.zoom_towards(1.0f + mouse_wheel_moved->delta.y * 0.1f, event_system.mouse_position());
                 return ui::HandleEventResult::EventHandled;
+            }
+        }
+        if (auto const mouse_clicked = std::get_if<ui::MouseClicked>(&event)) {
+            if (mouse_clicked->button == ui::MouseButton::Left and m_focused_planet.has_value()) {
+                m_selection_start = m_focused_planet.value();
+            }
+        } else if (auto const mouse_released = std::get_if<ui::MouseReleased>(&event)) {
+            if (mouse_released->button == ui::MouseButton::Left) {
+                m_selection_start = tl::nullopt;
             }
         }
         if (auto const key_pressed = std::get_if<ui::KeyPressed>(&event)) {

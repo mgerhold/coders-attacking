@@ -17,6 +17,7 @@ namespace view {
         std::vector<BackgroundStar> m_background_stars;
         tl::optional<GameObject const&> m_focused_planet;
         ServiceProvider* m_service_provider;
+        tl::optional<GameObject const&> m_selection_start;
 
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
 

@@ -74,4 +74,8 @@ namespace gfx {
     void Renderer::draw_fps(utils::Vec2i const position) {
         DrawFPS(position.x, position.y);
     }
+
+    void Renderer::draw_line(utils::Vec2i const start, utils::Vec2i const end, utils::Color const color) {
+        DrawLine(start.x, start.y, end.x, end.y, to_raylib(color));
+    }
 } // namespace gfx
