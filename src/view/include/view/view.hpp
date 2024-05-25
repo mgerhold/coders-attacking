@@ -40,6 +40,10 @@ namespace view {
 
         void regenerate_background_stars(c2k::Random::Seed seed);
 
+        [[nodiscard]] const Camera& camera() const {
+            return m_camera;
+        }
+
     private:
         [[nodiscard]] tl::optional<float> determine_visibility(
                 float max_radius,

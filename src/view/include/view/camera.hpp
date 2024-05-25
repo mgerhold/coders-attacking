@@ -41,10 +41,19 @@ namespace view {
             }
         }
 
+        [[nodiscard]] utils::Vec2f const& offset() const {
+            return m_offset;
+        }
+
+        [[nodiscard]] float zoom() const {
+            return m_zoom;
+        }
+
         void update(ServiceProvider const& service_provider) {
             static constexpr auto zoom_per_second = 10.0f;
             if (m_zoom_command.has_value()) {
-                auto const zoom_per_frame = zoom_per_second * static_cast<float>(service_provider.window().delta_seconds());
+                auto const zoom_per_frame =
+                        zoom_per_second * static_cast<float>(service_provider.window().delta_seconds());
                 apply_zoom_towards(1.0f + zoom_per_frame * m_zoom_command->amount, m_zoom_command->direction);
                 if (m_zoom_command->amount > 0.0f) {
                     m_zoom_command->amount -= zoom_per_frame;

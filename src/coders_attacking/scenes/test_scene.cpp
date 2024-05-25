@@ -19,6 +19,8 @@ TestScene::TestScene(ServiceProvider& service_provider)
     find_widget<Button>("button_save").on_click([&](Button&) { save(); });
     find_widget<Button>("button_load").on_click([&](Button&) { load(); });
     find_widget<Button>("button_regenerate").on_click([&](Button&) { regenerate(); });
+    m_coordinates_label = &find_widget<Label>("label_coordinates");
+    m_zoom_label = &find_widget<Label>("label_zoom");
     find_widget<Button>("button_exit").on_click([&](Button&) { m_running = false; });
     m_focused_planet_label = &find_widget<Label>("label_focused_planet");
 }
@@ -29,6 +31,9 @@ Scene::UpdateResult TestScene::update() {
     }
     m_game_view.update(m_galaxy);
     update_focused_planet_label();
+    m_coordinates_label->caption(std::format("Offset: ({:.2f},{:.2f})", m_game_view.camera().offset().x, m_game_view.camera().offset().y)
+    );
+    m_zoom_label->caption(std::format("Zoom: {:.2f}", m_game_view.camera().zoom()));
     return UpdateResult::KeepUpdating;
 }
 
@@ -84,6 +89,8 @@ void TestScene::regenerate() {
                 GridLayout::Area{{0,0},{1,1}}, // save button
                 GridLayout::Area{{0,1},{1,1}}, // load button
                 GridLayout::Area{{0,2},{1,1}}, // regenerate button
+                GridLayout::Area{{0,3},{1,1}}, // coordinates label
+                GridLayout::Area{{0,4},{1,1}}, // zoom label
                 GridLayout::Area{ { 14, 11 }, { 2, 1 } }, // exit button
                 GridLayout::Area{ { 1, 11 }, { 5, 1 } } // focused planet label
             );
@@ -97,6 +104,24 @@ void TestScene::regenerate() {
             std::make_unique<Button>(WidgetName{ "button_save" }, "Save", 1, font),
             std::make_unique<Button>(WidgetName{ "button_load" }, "Load", 2, font),
             std::make_unique<Button>(WidgetName{ "button_regenerate" }, "Regenerate", 3, font),
+            std::make_unique<Label>(
+                    WidgetName{ "label_coordinates" },
+                    "",
+                    font,
+                    40,
+                    Color::White,
+                    Alignment::Left,
+                    VerticalAlignment::Middle
+            ),
+            std::make_unique<Label>(
+                    WidgetName{ "label_zoom" },
+                    "",
+                    font,
+                    40,
+                    Color::White,
+                    Alignment::Left,
+                    VerticalAlignment::Middle
+            ),
             std::make_unique<Button>(WidgetName{ "button_exit" }, "Exit", 0, font),
             std::make_unique<Label>(
                     WidgetName{ "label_focused_planet" },

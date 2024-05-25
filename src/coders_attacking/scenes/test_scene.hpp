@@ -12,6 +12,8 @@ private:
     view::View m_game_view;
     bool m_running{ true };
     ui::Label* m_focused_planet_label;
+    ui::Label* m_coordinates_label;
+    ui::Label* m_zoom_label;
 
     static constexpr auto savegame_filename = "my_savegame.json";
 
