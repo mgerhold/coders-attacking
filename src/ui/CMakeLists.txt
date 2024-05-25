@@ -19,6 +19,8 @@ add_library(ui STATIC
         include/ui/focus_manager.hpp
         focus_manager.cpp
         button.cpp
+        include/ui/input_field.hpp
+        input_field.cpp
 )
 
 target_include_directories(ui

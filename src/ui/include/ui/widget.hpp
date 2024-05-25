@@ -70,7 +70,11 @@ namespace ui {
             m_focus_manager = &focus_manager;
         }
 
-        virtual void collect_focusable_widgets([[maybe_unused]] std::vector<Widget*>& focusable_widgets) { }
+        virtual void collect_focusable_widgets([[maybe_unused]] std::vector<Widget*>& focusable_widgets) {
+            if (focus_id().has_value()) {
+                focusable_widgets.emplace_back(this);
+            }
+        }
 
         [[nodiscard]] virtual tl::optional<u32> focus_id() const {
             return tl::nullopt;

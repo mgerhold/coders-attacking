@@ -54,6 +54,20 @@ namespace ui {
             m_pressed_keys.insert(Key{ key });
             m_event_queue.emplace_back(KeyPressed{ Key{ key } });
         }
+
+        for (auto const key : m_pressed_keys) {
+            if (IsKeyPressedRepeat(static_cast<int>(key))) {
+                m_event_queue.emplace_back(KeyRepeated{ Key{ key } });
+            }
+        }
+
+        while (true) {
+            auto const codepoint = GetCharPressed();
+            if (codepoint == 0) {
+                break;
+            }
+            m_event_queue.emplace_back(CharTyped{ codepoint });
+        }
     }
 
     void EventSystem::update_mouse() {

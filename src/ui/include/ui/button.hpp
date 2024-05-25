@@ -39,10 +39,6 @@ namespace ui {
             m_caption.caption(std::move(caption));
         }
 
-        void collect_focusable_widgets(std::vector<Widget*>& focusable_widgets) override {
-            focusable_widgets.push_back(this);
-        }
-
         void on_click(std::function<void(Button&)> function) {
             m_on_click = std::move(function);
         }

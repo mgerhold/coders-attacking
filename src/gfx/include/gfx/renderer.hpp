@@ -24,6 +24,7 @@ namespace gfx {
 
         void clear(utils::Color color);
         void draw_text(Font const& font, char const* text, utils::Vec2i position, float size, utils::Color color);
+        void draw_rectangle_outline(utils::IntRect const& area, utils::Color color);
         void draw_filled_rectangle(utils::IntRect const& area, utils::Color color);
         // clang-format off
         void draw_filled_rounded_rectangle(

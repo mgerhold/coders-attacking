@@ -66,7 +66,7 @@ namespace ui {
             auto const& sub_areas = m_layout->sub_areas();
             assert(sub_areas.size() == m_widgets.size());
             for (auto const& [widget, area] : zip(m_widgets, sub_areas)) {
-                auto const sub_area = IntRect{ FloatRect{ this->area() }.relative_to_absolute_rect(area) };
+                auto const sub_area = FloatRect{ this->area() }.relative_to_absolute_rect(area).round();
                 widget->recalculate_absolute_area(sub_area);
             }
         }

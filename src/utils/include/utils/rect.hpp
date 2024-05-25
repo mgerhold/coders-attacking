@@ -27,6 +27,18 @@ namespace utils {
             : top_left{ static_cast<T>(other.top_left.x), static_cast<T>(other.top_left.y) },
               size{ static_cast<T>(other.size.x), static_cast<T>(other.size.y) } { }
 
+        constexpr Rect<int> round()
+            requires(std::same_as<T, float>)
+        {
+            auto const new_top_left = Vec2i{ static_cast<int>(std::round(this->top_left.x)),
+                                         static_cast<int>(std::round(this->top_left.y)) };
+            auto const new_size = Vec2i{
+                static_cast<int>(std::round(this->size.x)),
+                static_cast<int>(std::round(this->size.y)),
+            };
+            return Rect<int>{ new_top_left, new_size };
+        }
+
         [[nodiscard]] constexpr Vec2<T> bottom_right() const {
             return top_left + size;
         }
@@ -47,13 +59,13 @@ namespace utils {
             return (absolute_position - top_left).hadamard_product(Vec2{ T{ 1 } / size.x, T{ 1 } / size.y });
         }
 
-        [[nodiscard]] constexpr Rect scaled_from_center(float const factor) {
+        [[nodiscard]] constexpr Rect scaled_from_center(float const factor) const {
             auto const vec = Vec2f{ center() } - Vec2f{ top_left };
             auto const new_top_left = Vec2f{ top_left } + (1.0f - factor) * vec;
             return Rect{ Vec2<T>{ new_top_left }, Vec2<T>{ Vec2f{ size } * factor } };
         }
 
-        [[nodiscard]] constexpr Rect inset(T const amount) {
+        [[nodiscard]] constexpr Rect inset(T const amount) const {
             return Rect{
                 Vec2<T>{
                         top_left.x + amount,
@@ -66,11 +78,11 @@ namespace utils {
             };
         }
 
-        [[nodiscard]] constexpr Rect shrink(Vec2<T> const amount) {
+        [[nodiscard]] constexpr Rect shrink(Vec2<T> const amount) const {
             return Rect{ top_left, size - amount };
         }
 
-        [[nodiscard]] constexpr Rect move(Vec2<T> const offset) {
+        [[nodiscard]] constexpr Rect move(Vec2<T> const offset) const {
             return Rect{ top_left + offset, size };
         }
 

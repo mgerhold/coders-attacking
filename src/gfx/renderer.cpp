@@ -32,6 +32,10 @@ namespace gfx {
         );
     }
 
+    void Renderer::draw_rectangle_outline(utils::IntRect const& area, utils::Color const color) {
+        DrawRectangleLines(area.top_left.x, area.top_left.y, area.size.x, area.size.y, to_raylib(color));
+    }
+
     void Renderer::draw_filled_rectangle(utils::IntRect const& area, utils::Color const color) {
         DrawRectangle(area.top_left.x, area.top_left.y, area.size.x, area.size.y, to_raylib(color));
     }

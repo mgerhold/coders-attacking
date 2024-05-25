@@ -11,8 +11,16 @@ namespace ui {
         Key key;
     };
 
+    struct KeyRepeated final {
+        Key key;
+    };
+
     struct KeyReleased final {
         Key key;
+    };
+
+    struct CharTyped final {
+        int codepoint;
     };
 
     struct MouseClicked final {
@@ -37,7 +45,9 @@ namespace ui {
     // clang-format off
     using Event = std::variant<
         KeyPressed,
+        KeyRepeated,
         KeyReleased,
+        CharTyped,
         MouseClicked,
         MouseReleased,
         MouseMoved,

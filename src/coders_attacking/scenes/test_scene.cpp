@@ -1,12 +1,11 @@
 #include "test_scene.hpp"
-
 #include "common/resource_manager.hpp"
 #include "gfx/window.hpp"
-
 #include <algorithm>
 #include <array>
 #include <lib2k/file_utils.hpp>
 #include <ui/grid_layout.hpp>
+#include <ui/input_field.hpp>
 
 using namespace ui;
 using namespace utils;
@@ -31,7 +30,8 @@ Scene::UpdateResult TestScene::update() {
     }
     m_game_view.update(m_galaxy);
     update_focused_planet_label();
-    m_coordinates_label->caption(std::format("Offset: ({:.2f},{:.2f})", m_game_view.camera().offset().x, m_game_view.camera().offset().y)
+    m_coordinates_label->caption(
+            std::format("Offset: ({:.2f},{:.2f})", m_game_view.camera().offset().x, m_game_view.camera().offset().y)
     );
     m_zoom_label->caption(std::format("Zoom: {:.2f}", m_game_view.camera().zoom()));
     return UpdateResult::KeepUpdating;
@@ -73,10 +73,11 @@ void TestScene::regenerate() {
 
 [[nodiscard]] IntRect TestScene::game_viewport() const {
     auto const size = service_provider().window().area().size;
-    return IntRect{
-        Vec2i{      size.x / 16,                0 },
-        Vec2i{ size.x * 15 / 16, size.y * 11 / 12 },
-    };
+    return FloatRect{
+        Vec2f{          size.x / 16.f,                   0.0f },
+        Vec2f{ size.x * 15.0f / 16.0f, size.y * 11.0f / 12.0f },
+    }
+            .round();
 }
 
 [[nodiscard]] std::unique_ptr<Widget> TestScene::create_user_interface(ServiceProvider& service_provider) {
@@ -84,15 +85,16 @@ void TestScene::regenerate() {
         auto layout = std::make_unique<GridLayout>(
                 16,
                 12,
-                GridLayout::Area{{0,0},{1,12}}, // left panel
-                GridLayout::Area{{1,11},{15,1}}, // bottom panel
-                GridLayout::Area{{0,0},{1,1}}, // save button
-                GridLayout::Area{{0,1},{1,1}}, // load button
-                GridLayout::Area{{0,2},{1,1}}, // regenerate button
-                GridLayout::Area{{0,3},{1,1}}, // coordinates label
-                GridLayout::Area{{0,4},{1,1}}, // zoom label
-                GridLayout::Area{ { 14, 11 }, { 2, 1 } }, // exit button
-                GridLayout::Area{ { 1, 11 }, { 5, 1 } } // focused planet label
+                GridLayout::Area{{0,0},{1,12}},          // left panel
+                GridLayout::Area{{1,11},{15,1}},         // bottom panel
+                GridLayout::Area{{0,0},{1,1}},           // save button
+                GridLayout::Area{{0,1},{1,1}},           // load button
+                GridLayout::Area{{0,2},{1,1}},           // regenerate button
+                GridLayout::Area{{0,3},{1,1}},           // coordinates label
+                GridLayout::Area{{0,4},{1,1}},           // zoom label
+                GridLayout::Area{ { 1, 11 }, { 5, 1 } }, // focused planet label
+                GridLayout::Area{ { 6, 11 }, { 3, 1 } }, // test input field
+                GridLayout::Area{ { 14, 11 }, { 2, 1 } } // exit button
             );
     // clang-format on
     auto const& font = service_provider.resource_manager().font(FontType::Roboto);
@@ -122,7 +124,6 @@ void TestScene::regenerate() {
                     Alignment::Left,
                     VerticalAlignment::Middle
             ),
-            std::make_unique<Button>(WidgetName{ "button_exit" }, "Exit", 0, font),
             std::make_unique<Label>(
                     WidgetName{ "label_focused_planet" },
                     "",
@@ -131,7 +132,9 @@ void TestScene::regenerate() {
                     Color::White,
                     Alignment::Left,
                     VerticalAlignment::Middle
-            )
+            ),
+            std::make_unique<InputField>(WidgetName{ "input_field_test" }, "test", 4, font),
+            std::make_unique<Button>(WidgetName{ "button_exit" }, "Exit", 0, font)
     );
     return user_interface;
 }
