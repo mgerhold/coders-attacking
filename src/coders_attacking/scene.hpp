@@ -33,15 +33,14 @@ public:
         StopUpdating,
     };
 
-    [[nodiscard]] virtual UpdateResult update() = 0;
+    [[nodiscard]] virtual UpdateResult update() {
+        return UpdateResult::KeepUpdating;
+    };
 
     [[nodiscard]] virtual ui::HandleEventResult handle_event(ui::Event const& event) {
-        auto const focus_manager_result = m_focus_manager.handle_event(event);
-        auto const user_interface_result = m_user_interface->handle_event(event);
-        return (focus_manager_result == ui::HandleEventResult::EventHandled
-                or user_interface_result == ui::HandleEventResult::EventHandled)
-                       ? ui::HandleEventResult::EventHandled
-                       : ui::HandleEventResult::EventNotHandled;
+        std::ignore = m_focus_manager.handle_event(event);
+        std::ignore = m_user_interface->handle_event(event);
+        return ui::HandleEventResult::EventHandled;
     }
 
     virtual void render(gfx::Renderer& renderer) const {

@@ -18,6 +18,7 @@ namespace view {
         tl::optional<GameObject const&> m_focused_planet;
         ServiceProvider* m_service_provider;
         tl::optional<GameObject const&> m_selection_start;
+        tl::optional<GameObject const&> m_selection_end;
 
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
 
@@ -43,6 +44,8 @@ namespace view {
         [[nodiscard]] const Camera& camera() const {
             return m_camera;
         }
+
+        [[nodiscard]] tl::optional<std::tuple<uuids::uuid, uuids::uuid>> pop_selection();
 
     private:
         [[nodiscard]] tl::optional<float> determine_visibility(

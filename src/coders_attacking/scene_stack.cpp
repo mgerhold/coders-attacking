@@ -28,6 +28,9 @@ void SceneStack::update() {
         m_scenes.erase(std::next(m_scenes.begin(), static_cast<decltype(m_scenes)::difference_type>(i)));
     }
     std::ranges::move(m_scene_manager_proxy.take_scenes_to_push(), std::back_inserter(m_scenes));
+    for (auto const& scene : m_scenes) {
+        scene->on_window_resized();
+    }
     assert(m_scene_manager_proxy.m_scenes_to_push.empty() and "all scenes should have been moved out");
 }
 

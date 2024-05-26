@@ -1,5 +1,7 @@
 #include "test_scene.hpp"
+
 #include "common/resource_manager.hpp"
+#include "fleet_size_selection.hpp"
 #include "gfx/window.hpp"
 #include <algorithm>
 #include <array>
@@ -41,14 +43,24 @@ Scene::UpdateResult TestScene::update() {
             std::format("Offset: ({:.2f},{:.2f})", m_game_view.camera().offset().x, m_game_view.camera().offset().y)
     );
     m_zoom_label->caption(std::format("Zoom: {:.2f}", m_game_view.camera().zoom()));
+    if (m_current_command.has_value()) {
+        service_provider().scene_manager().enqueue(std::make_unique<FleetSizeSelection>(service_provider()));
+        m_current_command.reset();
+    }
     return UpdateResult::KeepUpdating;
 }
 
 HandleEventResult TestScene::handle_event(Event const& event) {
-    if (Scene::handle_event(event) == HandleEventResult::EventHandled) {
-        return HandleEventResult::EventHandled;
+    std::ignore = Scene::handle_event(event);
+    std::ignore = m_game_view.handle_event(event);
+    if (auto const selection = m_game_view.pop_selection()) {
+        auto const& [start, end] = selection.value();
+        auto const start_name = m_galaxy.find_game_object(start)->get_component<Planet>()->name;
+        auto const end_name = m_galaxy.find_game_object(end)->get_component<Planet>()->name;
+        spdlog::info("ordered to move from {} to {}", start_name, end_name);
+        m_current_command = std::tuple{ start, end };
     }
-    return m_game_view.handle_event(event);
+    return HandleEventResult::EventHandled;
 }
 
 void TestScene::render(gfx::Renderer& renderer) const {

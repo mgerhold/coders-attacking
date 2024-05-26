@@ -10,6 +10,8 @@ add_executable(coders_attacking
         application.cpp
         scene_manager_proxy.cpp
         scene_manager_proxy.hpp
+        scenes/fleet_size_selection.cpp
+        scenes/fleet_size_selection.hpp
 )
 
 target_link_libraries(coders_attacking

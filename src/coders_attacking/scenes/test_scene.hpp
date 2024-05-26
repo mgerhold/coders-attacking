@@ -15,6 +15,7 @@ private:
     ui::Label* m_focused_planet_label;
     ui::Label* m_coordinates_label;
     ui::Label* m_zoom_label;
+    tl::optional<std::tuple<uuids::uuid, uuids::uuid>> m_current_command;
 
     static constexpr auto savegame_filename = "my_savegame.json";
 

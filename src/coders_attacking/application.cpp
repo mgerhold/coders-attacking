@@ -1,4 +1,6 @@
 #include "application.hpp"
+
+#include "scenes/fleet_size_selection.hpp"
 #include "scenes/test_scene.hpp"
 #include <gfx/render_context.hpp>
 

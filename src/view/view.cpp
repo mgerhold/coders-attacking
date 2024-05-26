@@ -84,7 +84,8 @@ namespace view {
 
                 renderer.draw_filled_circle(screen_coords, 5.0f, planet->color);
 
-                if (m_focused_planet.has_value() and m_focused_planet == game_object) {
+                if ((m_focused_planet.has_value() and m_focused_planet == game_object)
+                    or (m_selection_start.has_value() and m_selection_start.value() == game_object)) {
                     renderer.draw_circle(screen_coords, 9.0f, planet->color);
                 }
 
@@ -124,7 +125,12 @@ namespace view {
             }
         } else if (auto const mouse_released = std::get_if<ui::MouseReleased>(&event)) {
             if (mouse_released->button == ui::MouseButton::Left) {
-                m_selection_start = tl::nullopt;
+                if (m_focused_planet.has_value() and m_selection_start.has_value()
+                    and m_focused_planet.value() != m_selection_start.value()) {
+                    m_selection_end = m_focused_planet;
+                } else {
+                    m_selection_start = tl::nullopt;
+                }
             }
         }
         if (auto const key_pressed = std::get_if<ui::KeyPressed>(&event)) {
@@ -191,6 +197,16 @@ namespace view {
         for ([[maybe_unused]] auto const i : std::views::iota(usize{ 0 }, num_background_stars)) {
             m_background_stars.emplace_back(BackgroundStar::random(random));
         }
+    }
+
+    [[nodiscard]] tl::optional<std::tuple<uuids::uuid, uuids::uuid>> View::pop_selection() {
+        if (m_selection_start.has_value() and m_selection_end.has_value()) {
+            auto result = std::tuple{ m_selection_start->uuid(), m_selection_end->uuid() };
+            m_selection_start = tl::nullopt;
+            m_selection_end = tl::nullopt;
+            return result;
+        }
+        return tl::nullopt;
     }
 
     [[nodiscard]] tl::optional<float> View::determine_visibility(
