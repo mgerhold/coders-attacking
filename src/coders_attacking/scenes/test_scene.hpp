@@ -8,6 +8,7 @@
 
 class TestScene final : public Scene {
 private:
+    c2k::Random::Seed m_seed;
     Galaxy m_galaxy;
     view::View m_game_view;
     bool m_running{ true };
@@ -38,12 +39,12 @@ private:
         return dynamic_cast<T&>(m_user_interface->find_widget_by_name(name).value());
     }
 
-    void save() const;
-    void load();
-    void regenerate();
+    void on_save_clicked() const;
+    void on_load_clicked();
+    void on_regenerate_clicked();
 
     [[nodiscard]] utils::IntRect game_viewport() const;
     [[nodiscard]] static std::unique_ptr<ui::Widget> create_user_interface(ServiceProvider& service_provider);
-    [[nodiscard]] static Galaxy create_galaxy();
+    [[nodiscard]] static Galaxy create_galaxy(c2k::Random::Seed seed);
     void update_focused_planet_label() const;
 };

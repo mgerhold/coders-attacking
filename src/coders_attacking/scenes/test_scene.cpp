@@ -11,13 +11,20 @@ using namespace ui;
 using namespace utils;
 using namespace c2k;
 
+struct SaveGame final {
+    Random::Seed seed;
+    Galaxy galaxy;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SaveGame, seed, galaxy);
+
 TestScene::TestScene(ServiceProvider& service_provider)
     : Scene{ service_provider, create_user_interface(service_provider) },
-      m_galaxy{ create_galaxy() },
-      m_game_view{ service_provider, Random{}.next_integral<Random::Seed>() } {
-    find_widget<Button>("button_save").on_click([&](Button&) { save(); });
-    find_widget<Button>("button_load").on_click([&](Button&) { load(); });
-    find_widget<Button>("button_regenerate").on_click([&](Button&) { regenerate(); });
+      m_seed{ Random{}.next_integral<Random::Seed>() },
+      m_galaxy{ create_galaxy(m_seed) },
+      m_game_view{ service_provider, m_seed } {
+    find_widget<Button>("button_save").on_click([&](Button&) { on_save_clicked(); });
+    find_widget<Button>("button_load").on_click([&](Button&) { on_load_clicked(); });
+    find_widget<Button>("button_regenerate").on_click([&](Button&) { on_regenerate_clicked(); });
     m_coordinates_label = &find_widget<Label>("label_coordinates");
     m_zoom_label = &find_widget<Label>("label_zoom");
     find_widget<Button>("button_exit").on_click([&](Button&) { m_running = false; });
@@ -54,21 +61,26 @@ void TestScene::on_window_resized() {
     m_game_view.on_window_resized(game_viewport());
 }
 
-void TestScene::save() const {
+void TestScene::on_save_clicked() const {
+    auto const save_game = SaveGame{ m_seed, m_galaxy };
     // cannot use initializer list for the json constructor, since that would create an array
-    auto const json = nlohmann::json(m_galaxy);
+    auto const json = nlohmann::json(save_game);
     if (not write_file(savegame_filename, json.dump(4)).has_value()) {
         throw std::runtime_error{ "failed to write savegame" };
     }
 }
 
-void TestScene::load() {
-    m_galaxy = nlohmann::json::parse(read_file(savegame_filename).value()).get<Galaxy>();
+void TestScene::on_load_clicked() {
+    auto save_game = nlohmann::json::parse(read_file(savegame_filename).value()).get<SaveGame>();
+    m_seed = save_game.seed;
+    m_galaxy = std::move(save_game).galaxy;
+    m_game_view.regenerate_background_stars(m_seed);
 }
 
-void TestScene::regenerate() {
-    m_galaxy = create_galaxy();
-    m_game_view.regenerate_background_stars(Random{}.next_integral<Random::Seed>());
+void TestScene::on_regenerate_clicked() {
+    m_seed = Random{}.next_integral<Random::Seed>();
+    m_galaxy = create_galaxy(m_seed);
+    m_game_view.regenerate_background_stars(m_seed);
 }
 
 [[nodiscard]] IntRect TestScene::game_viewport() const {
@@ -139,7 +151,7 @@ void TestScene::regenerate() {
     return user_interface;
 }
 
-[[nodiscard]] Galaxy TestScene::create_galaxy() {
+[[nodiscard]] Galaxy TestScene::create_galaxy(Random::Seed const seed) {
     static constexpr auto planet_names = std::array{
         "Mercury",
         "Venus",
@@ -198,7 +210,7 @@ void TestScene::regenerate() {
     };
 
     auto galaxy = Galaxy{};
-    auto random = Random{};
+    auto random = Random{ seed };
 
     auto player0 = GameObject{ "Player0" };
     player0.add_component<Player>(Player{
