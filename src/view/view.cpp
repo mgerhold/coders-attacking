@@ -68,7 +68,7 @@ namespace view {
                                           + static_cast<double>(i) * 1.0 / num_radio_circles;
                         auto const relative = std::abs(time - std::floor(time));
                         auto const radius =
-                                static_cast<float>(min_radio_radius + relative * (max_radio_radius - min_radio_radius));
+                                static_cast<float>(min_radio_radius + relative * (static_cast<double>(max_radio_radius) - min_radio_radius));
                         renderer.draw_circle(
                                 screen_coords,
                                 radius,

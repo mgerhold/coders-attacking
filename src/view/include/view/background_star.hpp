@@ -40,10 +40,13 @@ namespace view {
             double const elapsed_time
         ) const { // clang-format on
             using namespace utils;
-            static constexpr auto pi = std::numbers::pi_v<float>;
-            auto const brightness = static_cast<float>(
-                    std::clamp(std::sin(elapsed_time * 2.0 * pi / m_period) * m_amplitude + m_base_brightness, 0.0, 1.0)
-            );
+            static constexpr auto pi = std::numbers::pi_v<double>;
+            auto const brightness = static_cast<float>(std::clamp(
+                    std::sin(elapsed_time * 2.0 * pi / static_cast<double>(m_period)) * static_cast<double>(m_amplitude)
+                            + static_cast<double>(m_base_brightness),
+                    0.0,
+                    1.0
+            ));
             auto const color = Color{
                 static_cast<u8>(static_cast<float>(m_color.r) * brightness),
                 static_cast<u8>(static_cast<float>(m_color.g) * brightness),
