@@ -43,6 +43,8 @@ namespace ui {
             m_on_click = std::move(function);
         }
 
+        void click();
+
         [[nodiscard]] tl::optional<u32> focus_id() const override {
             return m_focus_id;
         }

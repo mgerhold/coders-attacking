@@ -47,6 +47,13 @@ Scene::UpdateResult TestScene::update() {
         service_provider().scene_manager().enqueue(std::make_unique<FleetSizeSelection>(service_provider()));
         m_current_command.reset();
     }
+    if (auto const result = service_provider().scene_manager().pop_value<FleetSizeSelectionResult>()) {
+        if (auto const fleet_size = std::get_if<FleetSize>(&result.value())) {
+            spdlog::info("selected fleet size: {}", std::to_underlying(*fleet_size));
+        } else {
+            spdlog::info("fleet size selection canceled");
+        }
+    }
     return UpdateResult::KeepUpdating;
 }
 

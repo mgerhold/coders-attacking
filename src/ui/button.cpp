@@ -91,4 +91,10 @@ namespace ui {
         auto const label_area = area().scaled_from_center(0.9f);
         m_caption.recalculate_absolute_area(label_area);
     }
+
+    void Button::click() {
+        if (m_on_click) {
+            m_on_click(*this);
+        }
+    }
 } // namespace ui

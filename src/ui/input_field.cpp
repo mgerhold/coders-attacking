@@ -17,6 +17,10 @@ namespace ui {
           m_text_label{ "", font, 40, regular_color, Alignment::Left, VerticalAlignment::Middle },
           m_focus_id{ focus_id } { }
 
+    void InputField::on_enter_pressed(std::function<void(InputField&)> function) {
+        m_on_enter_pressed = std::move(function);
+    }
+
     [[nodiscard]] HandleEventResult InputField::handle_event(Event const event) {
         if (auto const mouse_clicked = std::get_if<MouseClicked>(&event);
             mouse_clicked != nullptr and mouse_clicked->button == MouseButton::Left) {
@@ -61,11 +65,17 @@ namespace ui {
             }
         }
 
+        if (auto const key_pressed = std::get_if<KeyPressed>(&event);
+            m_on_enter_pressed and key_pressed != nullptr
+            and (key_pressed->key == Key::Enter or key_pressed->key == Key::KpEnter)) {
+            m_on_enter_pressed(*this);
+        }
+
         return HandleEventResult::EventNotHandled;
     }
 
     void InputField::render(gfx::Renderer& renderer) const {
-        renderer.draw_filled_rectangle(area(), utils::Color::LightGray);
+        renderer.draw_filled_rectangle(area(), background_color);
         renderer.draw_rectangle_outline(area(), utils::Color::Black);
         if (text().is_empty()) {
             m_placeholder_label.render(renderer);
