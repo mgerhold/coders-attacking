@@ -138,7 +138,6 @@ void TestScene::on_regenerate_clicked() {
                 GridLayout::Area{{0,3},{1,1}},           // coordinates label
                 GridLayout::Area{{0,4},{1,1}},           // zoom label
                 GridLayout::Area{ { 1, 11 }, { 7, 1 } }, // focused planet label
-                GridLayout::Area{ { 8, 11 }, { 3, 1 } }, // test input field
                 GridLayout::Area{ { 14, 11 }, { 2, 1 } } // exit button
             );
     // clang-format on
@@ -178,7 +177,6 @@ void TestScene::on_regenerate_clicked() {
                     Alignment::Left,
                     VerticalAlignment::Middle
             ),
-            std::make_unique<InputField>(WidgetName{ "input_field_test" }, "test", 4, font),
             std::make_unique<Button>(WidgetName{ "button_exit" }, "Exit", 0, font)
     );
     return user_interface;
