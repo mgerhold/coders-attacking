@@ -9,8 +9,9 @@
 
 using namespace ui;
 
-FleetSizeSelection::FleetSizeSelection(ServiceProvider& service_provider)
-    : Scene{ service_provider, create_user_interface(service_provider) } {
+FleetSizeSelection::FleetSizeSelection(ServiceProvider& service_provider, usize const max_fleet_size)
+    : Scene{ service_provider, create_user_interface(service_provider, max_fleet_size) },
+      m_max_fleet_size{ max_fleet_size } {
     m_ok_button = &dynamic_cast<Button&>(m_user_interface->find_widget_by_name("button_ok").value());
     m_ok_button->on_click([&](Button const&) { m_result = DialogResult::Ok; });
     dynamic_cast<Button&>(m_user_interface->find_widget_by_name("button_cancel").value()).on_click([&](Button const&) {
@@ -28,7 +29,8 @@ FleetSizeSelection::FleetSizeSelection(ServiceProvider& service_provider)
     if (m_result.has_value()) {
         switch (m_result.value()) {
             case DialogResult::Ok: {
-                if (auto const amount = utils::lexical_cast<usize>(m_input_field->text().c_str())) {
+                if (auto const amount = utils::lexical_cast<usize>(m_input_field->text().c_str());
+                    amount.has_value() and amount.value() >= 1 and amount.value() <= m_max_fleet_size) {
                     service_provider().scene_manager().push_value(FleetSizeSelectionResult{
                             FleetSize{ amount.value() },
                     });
@@ -47,7 +49,11 @@ FleetSizeSelection::FleetSizeSelection(ServiceProvider& service_provider)
     return UpdateResult::StopUpdating;
 }
 
-std::unique_ptr<Widget> FleetSizeSelection::create_user_interface(ServiceProvider const& service_provider) {
+// clang-format off
+std::unique_ptr<Widget> FleetSizeSelection::create_user_interface(
+    ServiceProvider const& service_provider,
+    usize const max_fleet_size
+) { // clang-format on
     auto const& font = service_provider.resource_manager().font(FontType::Roboto);
     auto window = std::make_unique<Panel>(
             std::make_unique<GridLayout>(
@@ -75,7 +81,12 @@ std::unique_ptr<Widget> FleetSizeSelection::create_user_interface(ServiceProvide
     );
     sub_panel->add_widgets(
             std::make_unique<Label>("How many ships to send?", font, 40, utils::Color::Black, Alignment::Center),
-            std::make_unique<InputField>(WidgetName{ "input_field_fleet_size" }, "fleet size", 0, font),
+            std::make_unique<InputField>(
+                    WidgetName{ "input_field_fleet_size" },
+                    std::format("fleet size (1 - {})", max_fleet_size),
+                    0,
+                    font
+            ),
             std::make_unique<Button>(WidgetName{ "button_ok" }, "OK", 1, font),
             std::make_unique<Button>(WidgetName{ "button_cancel" }, "Cancel", 2, font)
     );

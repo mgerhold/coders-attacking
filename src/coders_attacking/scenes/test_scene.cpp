@@ -44,7 +44,15 @@ Scene::UpdateResult TestScene::update() {
     );
     m_zoom_label->caption(std::format("Zoom: {:.2f}", m_game_view.camera().zoom()));
     if (m_current_command.has_value()) {
-        service_provider().scene_manager().enqueue(std::make_unique<FleetSizeSelection>(service_provider()));
+        // clang-format off
+        // todo: change max fleet size in the following line
+        service_provider().scene_manager().enqueue(
+            std::make_unique<FleetSizeSelection>(
+                service_provider(),
+                usize{ 42 }
+            )
+        );
+        // clang-format on
         m_current_command.reset();
     }
     if (auto const result = service_provider().scene_manager().pop_value<FleetSizeSelectionResult>()) {
