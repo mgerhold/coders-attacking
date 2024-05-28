@@ -4,13 +4,6 @@
     return m_value_stack.empty();
 }
 
-[[nodiscard]] tl::optional<std::any> const& SceneManagerProxy::peek_value() {
-    if (is_value_stack_empty()) {
-        return tl::nullopt;
-    }
-    return m_value_stack.back();
-}
-
 [[nodiscard]] tl::optional<std::any> SceneManagerProxy::pop_value() {
     if (is_value_stack_empty()) {
         return tl::nullopt;

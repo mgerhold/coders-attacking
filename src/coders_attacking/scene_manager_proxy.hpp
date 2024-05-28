@@ -24,7 +24,6 @@ private:
     }
 
     [[nodiscard]] bool is_value_stack_empty() const;
-    [[nodiscard]] tl::optional<std::any> const& peek_value() override;
     [[nodiscard]] tl::optional<std::any> pop_value() override;
 
 public:

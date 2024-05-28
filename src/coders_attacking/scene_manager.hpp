@@ -19,7 +19,6 @@ public:
     virtual void end_scene() = 0;
     virtual void enqueue(std::unique_ptr<Scene> scene) = 0;
     virtual void push_value(std::any value) = 0;
-    [[nodiscard]] virtual tl::optional<std::any> const& peek_value() = 0;
     [[nodiscard]] virtual tl::optional<std::any> pop_value() = 0;
 
     template<typename T>
