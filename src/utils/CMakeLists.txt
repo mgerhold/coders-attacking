@@ -4,6 +4,7 @@ add_library(utils INTERFACE
         include/utils/rect.hpp
         include/utils/concepts.hpp
         include/utils/math.hpp
+        include/utils/lexical_cast.hpp
 )
 
 target_include_directories(utils INTERFACE include)

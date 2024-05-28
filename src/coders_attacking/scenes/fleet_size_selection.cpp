@@ -1,11 +1,11 @@
 #include "fleet_size_selection.hpp"
-#include "ui/button.hpp"
-#include "ui/input_field.hpp"
-#include "ui/label.hpp"
-#include <charconv>
 #include <common/font_type.hpp>
 #include <common/resource_manager.hpp>
+#include <ui/button.hpp>
 #include <ui/grid_layout.hpp>
+#include <ui/input_field.hpp>
+#include <ui/label.hpp>
+#include <utils/lexical_cast.hpp>
 
 using namespace ui;
 
@@ -21,21 +21,17 @@ FleetSizeSelection::FleetSizeSelection(ServiceProvider& service_provider)
             dynamic_cast<InputField&>(m_user_interface->find_widget_by_name("input_field_fleet_size").value());
     ;
     m_input_field = &input_field;
-    input_field.on_enter_pressed([&](InputField&) {
-        m_ok_button->click();
-    });
+    input_field.on_enter_pressed([&](InputField&) { m_ok_button->click(); });
 }
 
 [[nodiscard]] Scene::UpdateResult FleetSizeSelection::update() {
     if (m_result.has_value()) {
         switch (m_result.value()) {
             case DialogResult::Ok: {
-                auto amount = usize{ 0 };
-                auto const c_string = m_input_field->text().c_str();
-                auto const length = std::strlen(c_string);
-                auto const result = std::from_chars(c_string, c_string + length, amount);
-                if (result.ptr == c_string + length and result.ec == std::errc{}) {
-                    service_provider().scene_manager().push_value(FleetSizeSelectionResult{ FleetSize{ amount } });
+                if (auto const amount = utils::lexical_cast<usize>(m_input_field->text().c_str())) {
+                    service_provider().scene_manager().push_value(FleetSizeSelectionResult{
+                            FleetSize{ amount.value() },
+                    });
                     service_provider().scene_manager().end_scene();
                 } else {
                     m_result.reset();
