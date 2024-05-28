@@ -45,14 +45,20 @@ Scene::UpdateResult TestScene::update() {
     m_zoom_label->caption(std::format("Zoom: {:.2f}", m_game_view.camera().zoom()));
     if (m_current_command.has_value()) {
         // clang-format off
-        // todo: change max fleet size in the following line
-        service_provider().scene_manager().enqueue(
-            std::make_unique<FleetSizeSelection>(
-                service_provider(),
-                usize{ 42 }
-            )
-        );
+        auto const max_fleet_size = std::invoke([&] {
+            auto const source_planet = m_galaxy.find_game_object(std::get<0>(m_current_command.value())).value();
+            if (auto const fleet = source_planet.get_component<Fleet>()) {
+                return fleet->count;
+            }
+            return usize{ 0 };
+        });
+
         // clang-format on
+        if (max_fleet_size != 0) {
+            service_provider().scene_manager().enqueue(
+                    std::make_unique<FleetSizeSelection>(service_provider(), max_fleet_size)
+            );
+        }
         m_current_command.reset();
     }
     if (auto const result = service_provider().scene_manager().pop_value<FleetSizeSelectionResult>()) {
@@ -278,8 +284,10 @@ void TestScene::on_regenerate_clicked() {
         game_object.emplace_component<Planet>(std::move(planet_name), 10, color);
         if (i == home_planet_0) {
             game_object.add_component(Ownership{ player0.uuid() });
+            game_object.add_component(Fleet{ 100 });
         } else if (i == home_planet_1) {
             game_object.add_component(Ownership{ player1.uuid() });
+            game_object.add_component(Fleet{ 100 });
         }
         galaxy.game_objects().push_back(game_object);
     }
@@ -291,9 +299,13 @@ void TestScene::on_regenerate_clicked() {
 void TestScene::update_focused_planet_label() const {
     if (auto const& planet = m_game_view.focused_planet()) {
         auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
-        if (auto const owner_uuid = planet->get_component<Ownership>()) {
-            auto const owner = m_galaxy.find_game_object(owner_uuid->owner).value().get_component<Player>().value();
-            caption += std::format(" ({})", owner.name);
+        if (auto const ownership = planet->get_component<Ownership>()) {
+            auto const owner_uuid = m_galaxy.find_game_object(ownership->owner).value().get_component<Player>().value();
+            caption += std::format(" ({}", owner_uuid.name);
+            if (auto const fleet = planet->get_component<Fleet>()) {
+                caption += std::format(", {} ships", fleet->count);
+            }
+            caption += ')';
         }
         m_focused_planet_label->caption(caption);
 

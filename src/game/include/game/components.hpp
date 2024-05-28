@@ -37,10 +37,16 @@ struct Transform final {
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position);
 
-using Component = std::variant<Player, Ownership, Planet, Transform>;
+struct Fleet final {
+    static constexpr auto type = "Fleet";
+    usize count;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Fleet, count);
+
+using Component = std::variant<Player, Ownership, Planet, Transform, Fleet>;
 
 template<typename T>
-concept IsComponent = c2k::IsOneOf<T, Player, Ownership, Planet, Transform>;
+concept IsComponent = c2k::IsOneOf<T, Player, Ownership, Planet, Transform, Fleet>;
 
 template<typename... Ts>
 struct Overloaded : Ts... {
@@ -62,6 +68,8 @@ inline void from_json(nlohmann::json const& j, Component& component) {
         component = j.get<Planet>();
     } else if (type == Transform::type) {
         component = j.get<Transform>();
+    } else if (type == Fleet::type) {
+        component = j.get<Fleet>();
     } else {
         throw std::runtime_error{ std::format("'{}' is not a known component type", type.get<std::string>()) };
     }
@@ -80,6 +88,8 @@ inline void to_json(nlohmann::json& j, Component const& component) {
             },
         }
     );
+
+    assert(not result.contains("type"));
 
     // ...then also add the type tag
     visit(
