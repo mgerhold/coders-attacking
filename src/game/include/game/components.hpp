@@ -15,30 +15,32 @@ struct Player final {
     std::string name;
     utils::Color color;
 };
-
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Player, name, color);
+
+struct Ownership final {
+    static constexpr auto type = "Ownership";
+    uuids::uuid owner;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Ownership, owner);
 
 struct Planet final {
     static constexpr auto type = "Planet";
     std::string name;
     usize production_per_turn{ 0 };
     utils::Color color;
-    NullableUuidReference owner;
 };
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Planet, name, production_per_turn, color, owner);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Planet, name, production_per_turn, color);
 
 struct Transform final {
     static constexpr auto type = "Transform";
     utils::Vec2f position;
 };
-
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position);
 
-using Component = std::variant<Player, Planet, Transform>;
+using Component = std::variant<Player, Ownership, Planet, Transform>;
 
 template<typename T>
-concept IsComponent = c2k::IsOneOf<T, Player, Planet, Transform>;
+concept IsComponent = c2k::IsOneOf<T, Player, Ownership, Planet, Transform>;
 
 template<typename... Ts>
 struct Overloaded : Ts... {
@@ -54,6 +56,8 @@ inline void from_json(nlohmann::json const& j, Component& component) {
     auto const& type = j.at("type");
     if (type == Player::type) {
         component = j.get<Player>();
+    } else if (type == Ownership::type) {
+        component = j.get<Ownership>();
     } else if (type == Planet::type) {
         component = j.get<Planet>();
     } else if (type == Transform::type) {

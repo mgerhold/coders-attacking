@@ -57,6 +57,28 @@ public:
         return tl::nullopt;
     }
 
+    template<IsComponent... Cs>
+    [[nodiscard]] tl::optional<std::tuple<Cs const&...>> get_components() const {
+        static_assert((std::same_as<Cs, std::decay_t<Cs>> and ...));
+        // using exceptions for control flow 👍
+        try {
+            return std::tuple<Cs const&...>{ get_component<Cs>().value()... };
+        } catch (tl::bad_optional_access const&) {
+            return tl::nullopt;
+        }
+    }
+
+    template<IsComponent... Cs>
+    [[nodiscard]] tl::optional<std::tuple<Cs&...>> get_components() {
+        static_assert((std::same_as<Cs, std::decay_t<Cs>> and ...));
+        // using exceptions for control flow 👍
+        try {
+            return std::tuple<Cs&...>{ (get_component<Cs>().value(), ...) };
+        } catch (tl::bad_optional_access const&) {
+            return tl::nullopt;
+        }
+    }
+
     [[nodiscard]] uuids::uuid const& uuid() const {
         return m_uuid;
     }

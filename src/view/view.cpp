@@ -59,16 +59,18 @@ namespace view {
                 auto const view_coords = m_camera.world_to_view_coords(transform->position);
                 auto const screen_coords = m_camera.view_to_screen_coords(view_coords);
 
-                if (auto const owner_uuid = planet->owner.target_uuid()) {
+                if (auto const ownership = game_object.get_component<Ownership>()) {
+                    auto const owner_uuid = ownership->owner;
                     static constexpr auto num_radio_circles = 6;
                     static constexpr auto radio_animation_speed = 0.1;
                     for (auto i = 0; i < num_radio_circles; ++i) {
-                        auto const player = galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>();
+                        auto const player = galaxy.find_game_object(owner_uuid).value().get_component<Player>();
                         auto const time = m_service_provider->window().elapsed_seconds() / (1.0 / radio_animation_speed)
                                           + static_cast<double>(i) * 1.0 / num_radio_circles;
                         auto const relative = std::abs(time - std::floor(time));
-                        auto const radius =
-                                static_cast<float>(min_radio_radius + relative * (static_cast<double>(max_radio_radius) - min_radio_radius));
+                        auto const radius = static_cast<float>(
+                                min_radio_radius + relative * (static_cast<double>(max_radio_radius) - min_radio_radius)
+                        );
                         renderer.draw_circle(
                                 screen_coords,
                                 radius,
@@ -217,16 +219,12 @@ namespace view {
     ) const {
         float min_distance_to_owned_planet = std::numeric_limits<float>::max();
         for (auto const& game_object : galaxy.game_objects()) {
-            // clang-format off
-            if (
-                auto const& planet = game_object.get_component<Planet>();
-                planet.has_value()
-                and planet->owner == current_player_uuid
-            ) {
-                auto const distance = (
-                        game_object.get_component<Transform>().value().position - world_position
-                    ).magnitude();
-                // clang-format on
+            if (auto const components = game_object.get_components<Transform, Planet, Ownership>()) {
+                auto const& [transform, planet, ownership] = components.value();
+                if (ownership.owner != current_player_uuid) {
+                    continue;
+                }
+                auto const distance = (transform.position - world_position).magnitude();
                 if (distance < min_distance_to_owned_planet) {
                     min_distance_to_owned_planet = distance;
                 }

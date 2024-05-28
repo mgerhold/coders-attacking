@@ -269,9 +269,9 @@ void TestScene::on_regenerate_clicked() {
         auto planet_name = shuffled_planet_names.at(i);
         game_object.emplace_component<Planet>(std::move(planet_name), 10, color);
         if (i == home_planet_0) {
-            game_object.get_component<Planet>().value().owner = player0.uuid();
+            game_object.add_component(Ownership{ player0.uuid() });
         } else if (i == home_planet_1) {
-            game_object.get_component<Planet>().value().owner = player1.uuid();
+            game_object.add_component(Ownership{ player1.uuid() });
         }
         galaxy.game_objects().push_back(game_object);
     }
@@ -283,8 +283,8 @@ void TestScene::on_regenerate_clicked() {
 void TestScene::update_focused_planet_label() const {
     if (auto const& planet = m_game_view.focused_planet()) {
         auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
-        if (auto const owner_uuid = planet->get_component<Planet>().value().owner.target_uuid()) {
-            auto const owner = m_galaxy.find_game_object(owner_uuid.value()).value().get_component<Player>().value();
+        if (auto const owner_uuid = planet->get_component<Ownership>()) {
+            auto const owner = m_galaxy.find_game_object(owner_uuid->owner).value().get_component<Player>().value();
             caption += std::format(" ({})", owner.name);
         }
         m_focused_planet_label->caption(caption);
