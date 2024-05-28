@@ -11,13 +11,19 @@
 namespace view {
     using namespace utils;
 
-    View::View(ServiceProvider& service_provider, c2k::Random::Seed const background_stars_seed)
-        : m_camera{
+    View::View(
+            ServiceProvider& service_provider,
+            GameObject const& current_player,
+            c2k::Random::Seed background_stars_seed
+    )
+        : m_current_player{ &current_player },
+          m_camera{
               0.9f,
               10.0f,
               service_provider.window().area(),
               FloatRect::unit().move({ -0.5f, -0.5f }).scaled_from_center(1.4f),
-          }, m_service_provider{ &service_provider } {
+          },
+          m_service_provider{ &service_provider } {
         regenerate_background_stars(background_stars_seed);
     }
 
@@ -123,7 +129,10 @@ namespace view {
         }
         if (auto const mouse_clicked = std::get_if<ui::MouseClicked>(&event)) {
             if (mouse_clicked->button == ui::MouseButton::Left and m_focused_planet.has_value()) {
-                m_selection_start = m_focused_planet.value();
+                if (auto const ownership = m_focused_planet->get_component<Ownership>();
+                    ownership.has_value() and ownership->owner == m_current_player->uuid()) {
+                    m_selection_start = m_focused_planet.value();
+                }
             }
         } else if (auto const mouse_released = std::get_if<ui::MouseReleased>(&event)) {
             if (mouse_released->button == ui::MouseButton::Left) {
@@ -209,6 +218,10 @@ namespace view {
             return result;
         }
         return tl::nullopt;
+    }
+
+    [[nodiscard]] GameObject const& View::current_player() const {
+        return *m_current_player;
     }
 
     [[nodiscard]] tl::optional<float> View::determine_visibility(

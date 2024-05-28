@@ -13,6 +13,7 @@
 namespace view {
     class View final {
     private:
+        GameObject const* m_current_player;
         Camera m_camera;
         std::vector<BackgroundStar> m_background_stars;
         tl::optional<GameObject const&> m_focused_planet;
@@ -23,7 +24,7 @@ namespace view {
         static constexpr auto num_background_stars = usize{ 1500 * 3 };
 
     public:
-        explicit View(ServiceProvider& service_provider, c2k::Random::Seed background_stars_seed);
+        explicit View(ServiceProvider& service_provider, GameObject const& current_player, c2k::Random::Seed background_stars_seed);
 
         void render_game(Galaxy const& galaxy, gfx::Renderer& renderer) const;
 
@@ -39,15 +40,17 @@ namespace view {
             return m_focused_planet;
         }
 
-        void regenerate_background_stars(c2k::Random::Seed seed);
 
         [[nodiscard]] const Camera& camera() const {
             return m_camera;
         }
 
         [[nodiscard]] tl::optional<std::tuple<uuids::uuid, uuids::uuid>> pop_selection();
+        [[nodiscard]] GameObject const& current_player() const;
 
     private:
+        void regenerate_background_stars(c2k::Random::Seed seed);
+
         [[nodiscard]] tl::optional<float> determine_visibility(
                 float max_radius,
                 Galaxy const& galaxy,

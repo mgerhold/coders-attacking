@@ -32,4 +32,5 @@ public:
     }
 
     [[nodiscard]] tl::optional<GameObject const&> find_game_object(uuids::uuid uuid) const;
+    [[nodiscard]] tl::optional<GameObject const&> find_game_object(std::string_view name) const;
 };

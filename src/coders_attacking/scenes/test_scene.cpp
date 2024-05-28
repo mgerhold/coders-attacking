@@ -23,7 +23,7 @@ TestScene::TestScene(ServiceProvider& service_provider)
     : Scene{ service_provider, create_user_interface(service_provider) },
       m_seed{ Random{}.next_integral<Random::Seed>() },
       m_galaxy{ create_galaxy(m_seed) },
-      m_game_view{ service_provider, m_seed } {
+      m_game_view{ service_provider, m_galaxy.find_game_object("Player0").value(), m_seed } {
     find_widget<Button>("button_save").on_click([&](Button&) { on_save_clicked(); });
     find_widget<Button>("button_load").on_click([&](Button&) { on_load_clicked(); });
     find_widget<Button>("button_regenerate").on_click([&](Button&) { on_regenerate_clicked(); });
@@ -107,13 +107,13 @@ void TestScene::on_load_clicked() {
     auto save_game = nlohmann::json::parse(read_file(savegame_filename).value()).get<SaveGame>();
     m_seed = save_game.seed;
     m_galaxy = std::move(save_game).galaxy;
-    m_game_view.regenerate_background_stars(m_seed);
+    m_game_view = view::View{ service_provider(), m_galaxy.find_game_object("Player0").value(), m_seed };
 }
 
 void TestScene::on_regenerate_clicked() {
     m_seed = Random{}.next_integral<Random::Seed>();
     m_galaxy = create_galaxy(m_seed);
-    m_game_view.regenerate_background_stars(m_seed);
+    m_game_view = view::View{ service_provider(), m_galaxy.find_game_object("Player0").value(), m_seed };
 }
 
 [[nodiscard]] IntRect TestScene::game_viewport() const {
@@ -137,8 +137,8 @@ void TestScene::on_regenerate_clicked() {
                 GridLayout::Area{{0,2},{1,1}},           // regenerate button
                 GridLayout::Area{{0,3},{1,1}},           // coordinates label
                 GridLayout::Area{{0,4},{1,1}},           // zoom label
-                GridLayout::Area{ { 1, 11 }, { 5, 1 } }, // focused planet label
-                GridLayout::Area{ { 6, 11 }, { 3, 1 } }, // test input field
+                GridLayout::Area{ { 1, 11 }, { 7, 1 } }, // focused planet label
+                GridLayout::Area{ { 8, 11 }, { 3, 1 } }, // test input field
                 GridLayout::Area{ { 14, 11 }, { 2, 1 } } // exit button
             );
     // clang-format on
