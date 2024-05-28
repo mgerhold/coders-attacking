@@ -301,11 +301,10 @@ void TestScene::update_focused_planet_label() const {
         auto caption = m_game_view.focused_planet()->get_component<Planet>()->name;
         if (auto const ownership = planet->get_component<Ownership>()) {
             auto const owner_uuid = m_galaxy.find_game_object(ownership->owner).value().get_component<Player>().value();
-            caption += std::format(" ({}", owner_uuid.name);
+            caption += std::format(" ({})", owner_uuid.name);
             if (auto const fleet = planet->get_component<Fleet>()) {
                 caption += std::format(", {} ships", fleet->count);
             }
-            caption += ')';
         }
         m_focused_planet_label->caption(caption);
 

@@ -97,8 +97,16 @@ namespace view {
                     renderer.draw_circle(screen_coords, 9.0f, planet->color);
                 }
 
+                auto const text = std::invoke([&] {
+                    auto result = planet->name;
+                    if (auto const fleet = game_object.get_component<Fleet>()) {
+                        result += std::format(" ({} ships)", fleet->count);
+                    }
+                    return result;
+                });
+
                 static constexpr auto font_size = 20;
-                auto text_size = Vec2i{ font.measure_text(planet->name.c_str(), font_size) };
+                auto text_size = Vec2i{ font.measure_text(text.c_str(), font_size) };
                 auto const x = std::invoke([&] {
                     if (view_coords.x < 0.5f) {
                         return screen_coords.x + 7;
@@ -111,7 +119,7 @@ namespace view {
                     }
                     return screen_coords.y - text_size.y;
                 });
-                renderer.draw_text(font, planet->name.c_str(), Vec2i{ x, y }, font_size, Color::White);
+                renderer.draw_text(font, text.c_str(), Vec2i{ x, y }, font_size, Color::White);
             }
         }
     }
